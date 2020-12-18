@@ -15,7 +15,7 @@ description: >-                        # used by seo meta and the atom feed
   Here's a little garden where I share everything I've thought and learned.
 
 # fill in the base hostname & protocol for your site, e.g., 'https://username.github.io'
-url: 'https://miigon.github.io'
+url: 'https://miigon.github.io/blog'
 
 author: Miigon                  # change to your full name
 
