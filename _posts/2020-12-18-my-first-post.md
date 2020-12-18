@@ -2,7 +2,7 @@
 title: My first post.
 date: 2020-12-18 16:47:00 +0800
 categories: [Language, Uncategorized]
-tags: [javascript]     # TAG names should always be lowercase
+tags: [javascript]
 ---
 
 # The javascript language
