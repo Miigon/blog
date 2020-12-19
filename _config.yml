@@ -19,7 +19,7 @@ url: 'https://miigon.github.io'
 
 author: Miigon                  # change to your full name
 
-avatar: /assets/img/sample/avatar.jpg   # support internet resources
+avatar: https://avatars2.githubusercontent.com/u/16161991   # support internet resources
 
 github:
   username: Miigon             # change to your github username
@@ -77,7 +77,7 @@ disqus:
 #
 #     dark   - Use the dark color scheme
 #
-theme_mode:   # <light|dark>
+theme_mode:   light # <light|dark>
 
 # boolean type, the global switch for ToC in posts.
 toc: true
