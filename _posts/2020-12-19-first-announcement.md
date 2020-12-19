@@ -1,14 +1,14 @@
 ---
 title: Announcement | 公告
 date: 2020-12-19 16:25:00 +0800
-categories: [Language, Javascript]
-tags: [javascript]
+categories: [Announcement, Uncategorized]
+tags: [announcemet]
 ---
 
-# Miigon's blog
+# What?
 
 Here's my personal blog on which I may post stuffs like what I learned recently,
- what I found fascinating and want to talk about, or just simply some ramdom thoughts.
+ what I found fascinating and want to talk about, or just simply some random thoughts.
 
 # Why?
 
@@ -39,10 +39,11 @@ Inspirations will most likely come from:
 - My own understanding of the books
 
 
-I will most likely not be covering the front-end side of thing, since that's likely
-not the way I would go. But anything can change in the future, so who knows?
+I will not be covering the front-end side of thing, since that's not the path I decided to follow.
+But anything can change in the future, so who knows?
 
-I will try to keep the blog all-English in an effort to let my contents reach a broader audience, as well as improve my English at the same time.
+I will try to keep the blog all-English in an effort to let my contents reach a broader audience,
+and improve my English at the same time.
 
 # Disclaimer
 
