@@ -19,7 +19,7 @@ url: 'http://blog.miigon.ml'
 
 author: Miigon                  # change to your full name
 
-avatar: ./assets/img/avatar.png   # support internet resources
+avatar: /assets/img/avatar.png   # support internet resources
 
 github:
   username: Miigon             # change to your github username
@@ -44,7 +44,7 @@ social:
 
 # Only if your site type is GitHub Project sites and doesn't have a custom domain,
 # change below value to '/projectname'.
-baseurl: '/blog'
+baseurl: ''
 
 # Change to your timezone › http://www.timezoneconverter.com/cgi-bin/findzone/findzone
 timezone: Asia/Shanghai
