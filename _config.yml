@@ -15,11 +15,11 @@ description: >-                        # used by seo meta and the atom feed
   Here's a little garden where I share everything I've thought and learned.
 
 # fill in the base hostname & protocol for your site, e.g., 'https://username.github.io'
-url: 'https://miigon.github.io'
+url: 'http://blog.miigon.ml'
 
 author: Miigon                  # change to your full name
 
-avatar: https://avatars2.githubusercontent.com/u/16161991   # support internet resources
+avatar: ./assets/img/avatar.png   # support internet resources
 
 github:
   username: Miigon             # change to your github username
