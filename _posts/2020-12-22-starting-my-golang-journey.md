@@ -19,6 +19,11 @@ In this article series, I will document my learning process of the Go language.
 At the time of writing this article, I have very little Go language experience.  
 However, I do have a good amount of C++, C# and Python experiences.
 
+I do think that the best place to get information regarding a new language, library
+or framework is the official documentation and/or wiki, so in this series, most of the
+information will come from official sources, instead of from someone else's wiki posts
+or some other third party sources.  
+
 __In this particular article, We'll go through the process of installing Golang, as__
 __well as compiling our first program.__
 
