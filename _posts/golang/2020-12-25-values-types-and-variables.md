@@ -1,6 +1,6 @@
 ---
 title: "Golang: Values, Types and Variables"
-date: 2020-12-22 15:02:00 +0800
+date: 2020-12-22 19:27:00 +0800
 categories: [Language Learning, Golang]
 tags: [golang, learning]
 ---
