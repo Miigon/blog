@@ -1,5 +1,5 @@
 ---
-title: Starting my Golang journey
+title: "Golang: Starting my journey"
 date: 2020-12-22 10:22:00 +0800
 categories: [Language Learning, Golang]
 tags: [golang, learning]
@@ -7,6 +7,13 @@ tags: [golang, learning]
 
 # Golang
 
+> Disclaimer: This series is meant to compare the features and quirks of Golang with 
+> other languages like C, because that's basically how I learned the language. However, 
+> this means that the series might not be complete and detailed enough to be a tutorial 
+> for beginners.
+
+[Golang Official Documentation](https://golang.org/doc/)  
+[Golang Official Tour (Highly recommended)](https://tour.golang.org/)  
 [Golang Wikipedia](https://en.wikipedia.org/wiki/Go_(programming_language))
 
 Go is a statically typed, compiled programming language with memory safety, garbage
@@ -15,17 +22,25 @@ collection, structual typing, and CSP-style concurrency.
 It's simple, robust and efficient. We see more and more adaptation in recent years,
 in big companies like Tencent, Bilibili, Alibaba and ByteDance.
 
+
+# About the series
+
 In this article series, I will document my learning process of the Go language.
 At the time of writing this article, I have very little Go language experience.  
 However, I do have a good amount of C++, C# and Python experiences.
 
 I do think that the best place to get information regarding a new language, library
 or framework is the official documentation and/or wiki, so in this series, most of the
-information will come from official sources, instead of from someone else's wiki posts
-or some other third party sources.  
+information will come from official sources, instead of from someone else's blog posts
+or other third party sources.  
+
+Noted that this series is merely my own learning process, instead of a full tutorial
+for the language. I might write a full tutorial in English and/or Chinese after this
+one.
 
 __In this particular article, We'll go through the process of installing Golang, as__
 __well as compiling our first program.__
+
 
 # Downloading and Installing
 
