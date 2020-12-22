@@ -15,9 +15,9 @@ tags: [golang, learning]
 [Golang Wikipedia](https://en.wikipedia.org/wiki/Go_(programming_language))  
 [Golang Official Documentation](https://golang.org/doc/)  
 [How to Write Go Code](https://golang.org/doc/code.html)  
-[The Go Programming Language Specification](https://golang.org/ref/spec)  
-[Golang Official Tour (Highly recommended)](https://tour.golang.org/)  
-[Effective Go (Highly recommended)](https://golang.org/doc/effective_go.html)  
+For advanced devs:  [The Go Programming Language Specification](https://golang.org/ref/spec)  
+For beginners: 		[Golang Official Tour (Highly recommended)](https://tour.golang.org/)  
+For best practices: [Effective Go (Highly recommended)](https://golang.org/doc/effective_go.html)  
 
 Go is a statically typed, compiled programming language with memory safety, garbage
 collection, structual typing, and CSP-style concurrency.
