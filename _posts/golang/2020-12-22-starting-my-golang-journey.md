@@ -12,7 +12,7 @@ tags: [golang, learning]
 > this means that the series might not be complete and detailed enough to be a tutorial 
 > for beginners.
 
-[Golang Wikipedia](https://en.wikipedia.org/wiki/Go_(programming_language))
+[Golang Wikipedia](https://en.wikipedia.org/wiki/Go_(programming_language))  
 [Golang Official Documentation](https://golang.org/doc/)  
 [How to Write Go Code](https://golang.org/doc/code.html)  
 [The Go Programming Language Specification](https://golang.org/ref/spec)  
