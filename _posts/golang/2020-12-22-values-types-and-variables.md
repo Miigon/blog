@@ -17,14 +17,14 @@ other "C-like" languages, eg. C, C++, C#, Java.
 
 ## Declaration
 
-Basic usage:
+### Basic usage
 ```go
 var foo1 int                // variable declaration
 var foo2, foo3 int          // multiple variable declaration
 var foo2, foo3 int = 1, 2   // ... with initializers
 ```
 
-With implicit types:
+### With implicit types
 ```go
 var bar1, bar2 = 3.142, true    // type inferred from the right hand side
 // `bar1` -> float64, `bar2` -> bool
@@ -32,6 +32,7 @@ var bar1, bar2 = 3.142, true    // type inferred from the right hand side
 // notice how variables with different types can be declared together this way.
 ```
 
+### Short variable declaration
 Variable declaration with implicit types can be substituted for the more elegant
 `Short variable declaration`:
 ```go
@@ -41,8 +42,20 @@ var bar3 = "hello"
 
 bar4, bar5 := true, "world" // you can even do this
 ```
+Notice that __"short variable declaration" can be used multiple times for the same variable__:
+```go
+f, err := os.Open(name)
+// ...
+d, err := f.Stat()
+```
+Such code is perfectly legal. However, for the second part, `err` is only **reassigned**
+a new value instead of being declared for a second time.
 
-Grouped "factored" declaration (like "factored" import):
+Note: __This only works for variables within the same scope__. if a variable with the
+same name is defined in an outer scope, it would create a new variable in the current
+scope instead of reassigning the existing outer-scope one.)
+
+### Grouped "factored" declaration (like "factored" import)
 ```go
 var (
     foo1 uint = 12
