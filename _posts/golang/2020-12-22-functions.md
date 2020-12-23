@@ -56,7 +56,7 @@ The above example can be written like this:
 ```go
 func split(sum int) (x int, y int) {  // give names to our return values.
     x = sum * 4 / 9        // assign return value just like you would a normal variable
-    y = sum - x            // use `x` like an ordinary variable in calculation
+    y = sum - x            // use `x` like an ordinary variable
     return                 // return all values assigned before
 }
 ```
