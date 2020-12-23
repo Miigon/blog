@@ -22,7 +22,7 @@ func add(x int, y int) int {
 }
 ```
 
-Noted that in Go, type lies after variable/function name, which is different from all the
+Noted that in Go, type comes after variable/function name, which is different from all the
 other "C-like" languages, eg. C, C++, C#, Java.
 
 ## Unique syntaxes and syntax sugars
@@ -35,7 +35,7 @@ x int, y int
 
 x, y int
 ```
-The same is true for function parameters as well: 
+The same works for function parameters as well: 
 ```go
 func add(x int, y int) int { return x + y }
 
@@ -54,19 +54,20 @@ func split(sum int) (int, int) {
 ### 3. Named return value
 The above example can be written like this:
 ```go
-func split(sum int) (x int, y int) {
-    x = sum * 4 / 9        // assigns just like a normal variable
-    y = sum - x
-    return                 // returns all return values assigned before
+func split(sum int) (x int, y int) {  // give names to our return values.
+    x = sum * 4 / 9        // assign return value just like you would a normal variable
+    y = sum - x            // use `x` like an ordinary variable in calculation
+    return                 // return all values assigned before
 }
 ```
-you can even use the first rule and write it like this:
+you can also omit consecutive identical types except for the last one:
+(just like variables)
 ```go
-func split(sum int) (x, y int) { // <-- here
+func split(sum int) (x, y int) { // <-- notice here
     x = sum * 4 / 9
     y = sum - x
     return
 }
 ```
-Once you assigned all the return values, just do a simple `return` without anything
-after it, and Go will help you return all the values you assigned before.
+Once you assigned all the return values, do a simple `return` without anything
+after it, Go will help you return all the values you assigned before.
