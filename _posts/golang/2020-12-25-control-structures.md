@@ -22,13 +22,13 @@ __on the same line with the `if` keyword__. (due to Go's "semicolon insertion" f
 
 ```go
 if x> > 0 {
-    return y
+	return y
 }
 ```
 ```go
 if err := myPack.SomeOperation(); err != nil {
-    log.Print(err)
-    return err
+	log.Print(err)
+	return err
 }
 ```
 
@@ -40,17 +40,17 @@ a `if-else-if-else` chain as a `switch`.
 
 ```go
 func unhex(c byte) byte {
-    switch {
-    case '0' <= c && c <= '9':
-        return c - '0'
-    case 'a' <= c && c <= 'f':
-        return c - 'a' + 10
-    case 'A' <= c && c <= 'F':
-        return c - 'A' + 10
-    }
-    // notice how there is no `break`. In Go a case wouldn't fall through
-    // the next case like C would, even without `break`
-    return 0
+	switch {
+	case '0' <= c && c <= '9':
+		return c - '0'
+	case 'a' <= c && c <= 'f':
+		return c - 'a' + 10
+	case 'A' <= c && c <= 'F':
+		return c - 'A' + 10
+	}
+	// notice how there is no `break`. In Go a case wouldn't fall through
+	// the next case like C would, even without `break`
+	return 0
 }
 ```
 
@@ -66,11 +66,11 @@ Fortunately, Go provides us with 'comma-separated lists'.
 
 ```go
 func shouldEscape(c byte) bool {
-    switch c {
-    case ' ', '?', '&', '=', '#', '+', '%':
-        return true
-    }
-    return false
+	switch c {
+	case ' ', '?', '&', '=', '#', '+', '%':
+		return true
+	}
+	return false
 }
 ```
 
@@ -78,18 +78,18 @@ This is the equivalence of the following C code:
 
 ```c++
 bool shouldEscape(char c) {
-    switch(c) {
-        case ' ':
-        case '?':
-        case '&':
-        case '=':
-        case '#':
-        case '+':
-        case '%':
-            return true;
-        default:
-            return false;
-    }
+	switch(c) {
+		case ' ':
+		case '?':
+		case '&':
+		case '=':
+		case '#':
+		case '+':
+		case '%':
+			return true;
+		default:
+			return false;
+	}
 }
 ```
 
@@ -117,19 +117,19 @@ In this example, `f` will always be closed wherever we return in the function as
 as it's after the `defer f.Close()` statement.
 ```go
 func Contents(filename string) (string, error) {
-    f, err := os.Open(filename)
-    if err != nil {
-        return "", err  // before defer statement, so wouldn't trigger `f.Close()`
-    }
-    defer f.Close()  // f.Close() will run when we're finished.
-    
-    // do something...
+	f, err := os.Open(filename)
+	if err != nil {
+		return "", err			// before defer statement, so wouldn't trigger `f.Close()`
+	}
+	defer f.Close()				// f.Close() will run when we're finished.
+	
+	// do something...
 
-    if /* ... */ {
-        return nil, "error!" // f will be closed if we return here.
-    }
+	if /* ... */ {
+		return nil, "error!"	// f will be closed if we return here.
+	}
 
-    return string(result), nil // f will be closed if we return here.
+	return string(result), nil	// f will be closed if we return here.
 }
 ```
 

@@ -54,11 +54,11 @@ But if you are using Linux or macOS, it's highly recommended to install via
 a **package manager**:  
 
 For macOS with Homebrew:
-```
+```bash
 > brew install go
 ```
 For Ubuntu or Debian:
-```
+```bash
 > sudo apt-get install golang
 ```
 

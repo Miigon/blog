@@ -87,6 +87,7 @@ div > pre {
     font-size: $code-font-size;
     line-height: 1.4rem;
     word-wrap: normal; /* Fixed Safari overflow-x */
+    tab-size: 4; /* MIIGON: change tab-size from 8 to 4 */
   }
   table {
     padding: 0;

@@ -18,7 +18,7 @@ Instead, we will focus on comparing the same feature in Go and in C++ and see wh
 Here's a Go function declaration:
 ```go
 func add(x int, y int) int {
-    return x + y
+	return x + y
 }
 ```
 
@@ -47,26 +47,26 @@ func add(x, y int) int { return x + y }
 ### 2. Multiple return value
 ```go
 func split(sum int) (int, int) {
-    x := sum * 4 / 9        // short variable declaration
-    return x, sum - x       // return two values
+	x := sum * 4 / 9		// short variable declaration
+	return x, sum - x		// return two values
 }
 ```
 ### 3. Named return value
 The above example can be written like this:
 ```go
 func split(sum int) (x int, y int) {  // give names to our return values.
-    x = sum * 4 / 9        // assign return value just like you would a normal variable
-    y = sum - x            // use `x` like an ordinary variable
-    return                 // return all values assigned before
+	x = sum * 4 / 9			// assign return value just like you would a normal variable
+	y = sum - x				// use `x` like an ordinary variable
+	return					// return all values assigned before
 }
 ```
 you can also omit consecutive identical types except for the last one:
 (just like variables)
 ```go
 func split(sum int) (x, y int) { // <-- notice here
-    x = sum * 4 / 9
-    y = sum - x
-    return
+	x = sum * 4 / 9
+	y = sum - x
+	return
 }
 ```
 Once you assigned all the return values, do a simple `return` without anything

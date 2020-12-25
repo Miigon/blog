@@ -19,9 +19,9 @@ other "C-like" languages, eg. C, C++, C#, Java.
 
 ### Basic usage
 ```go
-var foo1 int                // variable declaration
-var foo2, foo3 int          // multiple variable declaration
-var foo2, foo3 int = 1, 2   // ... with initializers
+var foo1 int				// variable declaration
+var foo2, foo3 int			// multiple variable declaration
+var foo2, foo3 int = 1, 2	// ... with initializers
 ```
 
 ### With implicit types
@@ -36,11 +36,11 @@ var bar1, bar2 = 3.142, true    // type inferred from the right hand side
 Variable declaration with implicit types can be substituted for the more elegant
 `Short variable declaration`:
 ```go
-bar3 := "hello"             // short variable declaration
+bar3 := "hello"				// short variable declaration
 // equivalent to:
 var bar3 = "hello"
 
-bar4, bar5 := true, "world" // you can even do this
+bar4, bar5 := true, "world"	// you can even do this
 ```
 Notice that __"short variable declaration" can be used multiple times for the same variable__:
 ```go
@@ -58,9 +58,9 @@ scope instead of reassigning the existing outer-scope one.)
 ### Grouped "factored" declaration (like "factored" import)
 ```go
 var (
-    foo1 uint = 12
-    foo2 int = -3
-    isBar bool = true
+	foo1 uint = 12
+	foo2 int = -3
+	isBar bool = true
 )
 ```
 
@@ -78,7 +78,7 @@ uint uint8 uint16 uint32 uint64 uintptr
 byte // alias for uint8
 
 rune // alias for int32
-     // represents a Unicode code point
+	 // represents a Unicode code point
 
 float32 float64
 
@@ -89,9 +89,9 @@ The `int`, `uint`, and `uintptr` types are usually 32 bits wide on 32-bit system
 ### Type conversion (or the lack of it)
 __The expression T(v) converts the value v to the type T.__
 ```go
-i := 42             // int
-f := float64(i)     // float64
-u := uint(f)        // uint
+i := 42				// int
+f := float64(i)		// float64
+u := uint(f)		// uint
 ```
 Unlike in C,
 in Go __assignment between items of different type requires an explicit conversion__.
@@ -99,7 +99,7 @@ in Go __assignment between items of different type requires an explicit conversi
 This means the following code:
 ```go
 var i int = 42
-var f float32 = i  // error
+var f float32 = i	// error
 ```
 should not work. Because Go doesn't allow implicit type conversion.
 
