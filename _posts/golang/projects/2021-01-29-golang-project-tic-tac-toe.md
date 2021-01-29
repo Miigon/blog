@@ -354,7 +354,7 @@ Also, the function is still repetitive since the actual "checking" part inside e
 
 are the same.
 
-### 
+### A better approach
 
 In order to know if anyone has won the game, we have to check for 3 horizontal lines, 3 vertical
  lines and 2 diagonal lines. We can think of the process of checking each line like this:
@@ -363,7 +363,7 @@ In order to know if anyone has won the game, we have to check for 3 horizontal l
 2. set current square position to `(x + a, y + b)`
 3. repeat the process until different marks between iteration was found or a border was hit.
 
-It's a generalized description of all the for-loops we discussed before. By using different delta `(a, b)`,
+This is a generalized description of all the for-loops we discussed before. By using different delta `(a, b)`,
  we can control how we move between different iterations. So __the same code can be used to check for
  horizontals, verticals	and diagonals__.
 
