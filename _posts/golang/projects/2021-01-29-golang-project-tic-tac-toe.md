@@ -5,6 +5,12 @@ categories: [Execises, Golang]
 tags: [golang, project]
 ---
 
+In this article, I'll go through my process of writing a simple Tic-Tac-Toe
+ game in Golang. Error handling, closures, iota as well as other golang features
+ are used to create the game.
+
+> Before we start:
+> 
 > After some more research to the language, It seems that Go is really not _that_
 > different from order C-family programming languages. So I decided that it would
 > not be worthwhile to document every single detail of Golang in my blog posts, since
@@ -13,14 +19,8 @@ tags: [golang, project]
 > make much sense for me to write about everything, a quick Google search will usually
 > work better.
 >     
-> I decided to focus this article series on my experiences of making experimental or
-> actual project with Golang and trying to cover some features and neuances of Golang in 
-> the process.
-
-
-In this article, I'll go through my process of writing a simple Tic-Tac-Toe
- game in Golang. The goal of this project is to practice my golang skill and
- learn how to do certain things in Golang.
+> As a result, this article series will now be focused on my experiences of making experimental
+> and/or actual project with Golang. The goal is to show Golang's features and neuances.
 
 [Full code on Github](https://github.com/Miigon/full-codes-from-blog/blob/master/tic-tac-toe.go)
 
