@@ -573,6 +573,30 @@ footer {
   }
 }
 
+#access-links {
+  ul {
+    > li {
+      height: 1.8rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      list-style: none;
+    }
+    a {
+      color: #6c757d;
+    }
+  }
+
+  a {
+    @extend %no-bottom-border;
+    &:hover {
+      @extend %link-hover;
+    }
+  }
+}
+
 /*--- button back-to-top ---*/
 
 #back-to-top {
