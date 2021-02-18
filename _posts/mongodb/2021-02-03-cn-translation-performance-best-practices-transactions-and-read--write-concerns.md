@@ -2,7 +2,7 @@
 title: "MongoDB 高性能最佳实践: 事务，读取关心程度与写入关心程度"
 date: 2021-02-03 21:09:11 +0800
 categories: [Backend, Database, MongoDB]
-tags: [Chinese, Translated]
+tags: [Chinese, translated]
 ---
 
 > 本文章为翻译作品，原作者为 Mat Keep 与 Henrik Ingo  
