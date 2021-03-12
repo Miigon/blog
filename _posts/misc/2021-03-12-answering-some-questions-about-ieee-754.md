@@ -16,7 +16,7 @@ tags: [computer system, Chinese]
 
 -6.625 = -(4 + 2 + 1/2 + 1/8)，一位一位对应过来，二进制表示就是 -110.101，那么使用浮点数表示 6.625 的话，内存中实际存储的比特位是这个样子的：
 
-![课堂上的例子](/assets/img/ieee754-img/img1.png)
+![课堂上的例子](/assets/img/ieee754-img/img1fixed.png)
 <!--
 首先浮点数的表示，是分为三个规则的，在指数部分为 00000000 的时候是一种特殊情况（Subnormal number），在指数部分为 11111111 的时候是另一种特殊情况 (Infinity / NaN) ，剩下的 00000001 ~ 11111110（0 ~ 254）的范围是 Normal number 的范围。
 -->
@@ -61,7 +61,7 @@ tags: [computer system, Chinese]
 我们也可以做一个小实验，我们还是以 -110.101 作为例子，看一下**如果假设有效数字个位是 0**，会有什么效果：
 
 ### 规定 1 为整数部分（与开头的例子相同）
-![规定 1 为整数部分](/assets/img/ieee754-img/img1.png)
+![规定 1 为整数部分](/assets/img/ieee754-img/img1fixed.png)
 ### 规定 0 为整数部分（注意对比 N 公式的变化）
 ![规定 0 为整数部分](/assets/img/ieee754-img/img4.png)
 
