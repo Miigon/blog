@@ -1,0 +1,759 @@
+<!DOCTYPE html><html lang="en" mode="light" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="theme" content="Customized Chirpy v2.6.2"><meta name="generator" content="Jekyll v4.2.0" /><meta property="og:title" content="Golang Project: Tic Tac Toe" /><meta name="author" content="Miigon" /><meta property="og:locale" content="en_US" /><meta name="description" content="In this article, I’ll go through my process of writing a simple Tic-Tac-Toe game in Golang. Error handling, closures, iota as well as other golang features are used to create the game." /><meta property="og:description" content="In this article, I’ll go through my process of writing a simple Tic-Tac-Toe game in Golang. Error handling, closures, iota as well as other golang features are used to create the game." /><link rel="canonical" href="https://blog.miigon.net/posts/golang-project-tic-tac-toe/" /><meta property="og:url" content="https://blog.miigon.net/posts/golang-project-tic-tac-toe/" /><meta property="og:site_name" content="Miigon’s blog" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2021-01-29T09:23:36+08:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="Golang Project: Tic Tac Toe" /> <script type="application/ld+json"> {"description":"In this article, I’ll go through my process of writing a simple Tic-Tac-Toe game in Golang. Error handling, closures, iota as well as other golang features are used to create the game.","url":"https://blog.miigon.net/posts/golang-project-tic-tac-toe/","@type":"BlogPosting","headline":"Golang Project: Tic Tac Toe","dateModified":"2021-01-29T21:54:49+08:00","datePublished":"2021-01-29T09:23:36+08:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.miigon.net/posts/golang-project-tic-tac-toe/"},"author":{"@type":"Person","name":"Miigon"},"@context":"https://schema.org"}</script><title>Golang Project: Tic Tac Toe | Miigon's blog</title><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico" type="image/x-icon"><link rel="icon" href="/assets/img/favicons/favicon.ico" type="image/x-icon"><link rel="apple-touch-icon" href="/assets/img/favicons/apple-icon.png"><link rel="apple-touch-icon" href="/assets/img/favicons/apple-icon-precomposed.png"><link rel="apple-touch-icon" sizes="57x57" href="/assets/img/favicons/apple-icon-57x57.png"><link rel="apple-touch-icon" sizes="60x60" href="/assets/img/favicons/apple-icon-60x60.png"><link rel="apple-touch-icon" sizes="72x72" href="/assets/img/favicons/apple-icon-72x72.png"><link rel="apple-touch-icon" sizes="76x76" href="/assets/img/favicons/apple-icon-76x76.png"><link rel="apple-touch-icon" sizes="114x114" href="/assets/img/favicons/apple-icon-114x114.png"><link rel="apple-touch-icon" sizes="120x120" href="/assets/img/favicons/apple-icon-120x120.png"><link rel="apple-touch-icon" sizes="144x144" href="/assets/img/favicons/apple-icon-144x144.png"><link rel="apple-touch-icon" sizes="152x152" href="/assets/img/favicons/apple-icon-152x152.png"><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-icon-180x180.png"><link rel="icon" type="image/png" sizes="192x192" href="/assets/img/favicons/android-icon-192x192.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="96x96" href="/assets/img/favicons/favicon-96x96.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/manifest.json"><meta name='msapplication-config' content='/assets/img/favicons/browserconfig.xml'><meta name="msapplication-TileColor" content="#ffffff"><meta name="msapplication-TileImage" content="/assets/img/favicons/ms-icon-144x144.png"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://fonts.gstatic.com"><link rel="preconnect" href="https://www.google-analytics.com" crossorigin="use-credentials"><link rel="dns-prefetch" href="https://www.google-analytics.com"><link rel="preconnect" href="https://www.googletagmanager.com" crossorigin="anonymous"><link rel="dns-prefetch" href="https://www.googletagmanager.com"><link rel="preconnect" href="cdn.jsdelivr.net"><link rel="dns-prefetch" href="cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha256-LA89z+k9fjgMKQ/kq4OO2Mrf8VltYml/VES+Rg0fh20=" crossorigin="anonymous"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css" integrity="sha256-+N4/V/SbAFiW1MPBCXnfnP9QSN3+Keu+NlB+0ev/YKQ=" crossorigin="anonymous"><link rel="preload" href="/assets/css/post.css" as="style"><link rel="stylesheet" href="/assets/css/post.css"><link rel="preload" as="style" href="/assets/css/lib/bootstrap-toc.min.css"><link rel="stylesheet" href="/assets/css/lib/bootstrap-toc.min.css" /> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script defer src="https://cdn.jsdelivr.net/combine/npm/popper.js@1.15.0,npm/bootstrap@4/dist/js/bootstrap.min.js"></script> <script async src="/assets/js/post.min.js"></script> <script defer src="/app.js"></script> <script defer src="https://www.googletagmanager.com/gtag/js?id="></script> <script> document.addEventListener("DOMContentLoaded", function(event) { window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', ''); }); </script><body data-spy="scroll" data-target="#toc"><div id="sidebar" class="d-flex flex-column"><div id="nav-wrapper"><div id="profile-wrapper" class="d-flex flex-column"><div id="avatar" class="d-flex justify-content-center"> <a href="/" alt="avatar"> <img src="/assets/img/avatar.png" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="profile-text mt-3"><div class="site-title"> <a href="/">Miigon's blog</a></div><div class="site-subtitle font-italic">My ideas, thoughts and experiences</div></div></div><ul class="nav flex-column"><li class="nav-item d-flex justify-content-center "> <a href="/" class="nav-link d-flex justify-content-center align-items-center w-100"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>HOME</span> </a><li class="nav-item d-flex justify-content-center "> <a href="/tabs/categories/" class="nav-link d-flex justify-content-center align-items-center w-100"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>CATEGORIES</span> </a><li class="nav-item d-flex justify-content-center "> <a href="/tabs/tags/" class="nav-link d-flex justify-content-center align-items-center w-100"> <i class="fa-fw fas fa-tags ml-xl-3 mr-xl-3 unloaded"></i> <span>TAGS</span> </a><li class="nav-item d-flex justify-content-center "> <a href="/tabs/archives/" class="nav-link d-flex justify-content-center align-items-center w-100"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>ARCHIVES</span> </a><li class="nav-item d-flex justify-content-center "> <a href="/tabs/about/" class="nav-link d-flex justify-content-center align-items-center w-100"> <i class="fa-fw fas fa-info ml-xl-3 mr-xl-3 unloaded"></i> <span>ABOUT</span> </a></ul></div><div class="sidebar-bottom d-flex flex-wrap justify-content-around mt-4"> <a href="https://github.com/Miigon" aria-label="github" target="_blank" rel="noopener"> <i class="fab fa-github-alt"></i> </a> <a href="https://twitter.com/" aria-label="twitter" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['miigon.pg','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="https://stackoverflow.com/users/7509248/miigon" aria-label="stack-overflow" target="_blank" rel="noopener"> <i class="fab fa-stack-overflow"></i> </a></div></div><div id="topbar-wrapper" class="row justify-content-center topbar-down"><div id="topbar" class="col-11 d-flex h-100 align-items-center justify-content-between"> <span id="breadcrumb"> <span> <a href="/"> Posts </a> </span> <span>Golang Project: Tic Tac Toe</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> Post</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" placeholder="Search..."> <i class="fa fa-times-circle fa-fw" id="search-cleaner"></i> </span> <span id="search-cancel" >Cancel</span></div></div><div id="main-wrapper"><div id="main"><div class="row"><div id="post-wrapper" class="col-12 col-lg-11 col-xl-8"><div class="post pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><h1 data-toc-skip>Golang Project: Tic Tac Toe</h1><div class="post-meta text-muted d-flex flex-column"><div> <span class="timeago " data-toggle="tooltip" data-placement="bottom" title="Fri, Jan 29, 2021, 9:23 AM +0800" > Jan 29 <i class="unloaded">2021-01-29T09:23:36+08:00</i> </span> by <span class="author"> Miigon </span></div><div> <span> Updated <span class="timeago lastmod" data-toggle="tooltip" data-placement="bottom" title="Fri, Jan 29, 2021, 9:54 PM +0800" > Jan 29 <i class="unloaded">2021-01-29T21:54:49+08:00</i> </span> </span> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="2905 words">16 min</span></div></div><div class="post-content"><p>In this article, I’ll go through my process of writing a simple Tic-Tac-Toe game in Golang. Error handling, closures, iota as well as other golang features are used to create the game.</p><blockquote><p>Before we start:</p><p>After some more research to the language, It seems that Go is really not <em>that</em> different from order C-family programming languages. So I decided that it would not be worthwhile to document every single detail of Golang in my blog posts, since there’s a lot of resources readily available on the internet which go much deeper into the Go language features than my blog will ever be able to do. So it doesn’t make much sense for me to write about everything, a quick Google search will usually work better.</p><p>As a result, this article series will now be focused on my experiences of making experimental and/or actual project with Golang. The goal is to show Golang’s features and neuances.</p></blockquote><p><a href="https://github.com/Miigon/full-codes-from-blog/blob/master/tic-tac-toe.go">Full code on Github</a></p><h1 id="define-the-board-and-game-state">Define the board and game state</h1><p>The first thing we want to do is define the board on which the game will be played on.</p><p>The game Tic-Tac-Toe has a 3*3 board. Each of the squares can be one of three states: it can be a <code class="language-plaintext highlighter-rouge">X</code> or a <code class="language-plaintext highlighter-rouge">O</code>, or it can be just empty. We define these states with type alias and const definition, which is Go’s equivalance of <code class="language-plaintext highlighter-rouge">enum</code>:</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre><td class="rouge-code"><pre><span class="c">// what kind of piece is on a certain square</span>
+<span class="k">type</span> <span class="n">squareState</span> <span class="kt">int</span>
+
+<span class="k">const</span> <span class="p">(</span>
+	<span class="n">none</span>   <span class="o">=</span> <span class="no">iota</span>
+	<span class="n">cross</span>  <span class="o">=</span> <span class="no">iota</span>
+	<span class="n">circle</span> <span class="o">=</span> <span class="no">iota</span>
+<span class="p">)</span>
+
+</pre></table></code></div></div><p><code class="language-plaintext highlighter-rouge">iota</code> represents successive integer constants 0,1,2,….<br /> It resets to 0 whenever the keyword <code class="language-plaintext highlighter-rouge">const</code> appears in the source code and increments after each const specification.<br /> In our case, <code class="language-plaintext highlighter-rouge">none</code> would be 0, <code class="language-plaintext highlighter-rouge">cross</code> would be 1 and <code class="language-plaintext highlighter-rouge">circle</code> would be 2.</p><p>Noted that all the <code class="language-plaintext highlighter-rouge">iota</code>(except for the first one) can be omitted and still have the same effect.</p><p>With <code class="language-plaintext highlighter-rouge">suqareState</code> we can represent the state of one square, now we can use a 3*3 array to represent the whole board.</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre><span class="k">var</span> <span class="n">board</span> <span class="p">[</span><span class="m">3</span><span class="p">][</span><span class="m">3</span><span class="p">]</span><span class="n">squareState</span>
+</pre></table></code></div></div><p>For each turn, we also need to know whose turn it is. So we introduce another variable to represent that:</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="k">type</span> <span class="n">player</span> <span class="kt">int</span>
+
+<span class="k">var</span> <span class="n">turnPlayer</span> <span class="n">player</span>
+</pre></table></code></div></div><p>We don’t have to define constants again, the constants defined for the squareState before can be used.</p><blockquote><p>This is when we run into the discussion about whether Golang’s decision to not include C/C++ style enum keyword had made the language difficult to use in some cases.</p><p>Some have argued that the lack of compile-time type checking makes the code more prone to mistakes. <code class="language-plaintext highlighter-rouge">const</code> names being in the same package scope also can cause some confusion. Since it’s not always immediately obvious which enum a const name belongs to when you see one.</p></blockquote><p>The last thing for us to do is wrap them (the board &amp; whose turn is it) up as the current game state struct:</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="c">// current state of the game</span>
+<span class="k">type</span> <span class="n">gameState</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">board</span> <span class="p">[</span><span class="m">3</span><span class="p">][</span><span class="m">3</span><span class="p">]</span><span class="n">squareState</span>
+	<span class="n">turnPlayer</span> <span class="n">player</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>Storing them as saparate global variables will work as well, but using <code class="language-plaintext highlighter-rouge">struct</code> is usually a better practice.<br /> It makes the code easier to understand. And also enables us to do some other cool things.<br /> (eg. an “undo” feature, which we will talk about later)</p><h1 id="draw-the-board">Draw the board</h1><p>Next, we need a way to show our board on the screen. We use <code class="language-plaintext highlighter-rouge">fmt</code> to draw the board to the terminal.</p><p>The code is pretty standard:</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+</pre><td class="rouge-code"><pre><span class="c">// define a method for struct type `gameState`</span>
+<span class="k">func</span> <span class="p">(</span><span class="n">state</span> <span class="o">*</span><span class="n">gameState</span><span class="p">)</span> <span class="n">drawBoard</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span> <span class="p">{</span>
+		<span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">square</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">row</span> <span class="p">{</span>
+			<span class="n">fmt</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="s">" "</span><span class="p">)</span>
+			<span class="k">switch</span> <span class="n">square</span> <span class="p">{</span>
+			<span class="k">case</span> <span class="n">none</span><span class="o">:</span>
+				<span class="n">fmt</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="s">" "</span><span class="p">)</span>
+			<span class="k">case</span> <span class="n">cross</span><span class="o">:</span>
+				<span class="n">fmt</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="s">"X"</span><span class="p">)</span>
+			<span class="k">case</span> <span class="n">circle</span><span class="o">:</span>
+				<span class="n">fmt</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="s">"O"</span><span class="p">)</span>
+			<span class="p">}</span>
+			<span class="k">if</span> <span class="n">j</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="o">-</span><span class="m">1</span> <span class="p">{</span>
+				<span class="n">fmt</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="s">" |"</span><span class="p">)</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">)</span><span class="o">-</span><span class="m">1</span> <span class="p">{</span>
+			<span class="n">fmt</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">------------"</span><span class="p">)</span>
+		<span class="p">}</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>(Notice how <code class="language-plaintext highlighter-rouge">break</code> is not required in switch cases in Go.)</p><p>Now we test our <code class="language-plaintext highlighter-rouge">drawBoard</code> function with a main function like this:</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre><td class="rouge-code"><pre><span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">state</span> <span class="o">:=</span> <span class="n">gameState</span><span class="p">{}</span>
+
+	<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">cross</span>
+	<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">circle</span>
+
+	<span class="n">state</span><span class="o">.</span><span class="n">drawBoard</span><span class="p">()</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>which yields:</p><div class="language-plaintext highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre><td class="rouge-code"><pre>$ go run main.go 
+   | X |  
+------------
+   | O |  
+------------
+   |   |  
+</pre></table></code></div></div><p><strong>Hooray! It works.</strong></p><h1 id="game-logic">Game logic</h1><p>Now it’s time for the game logic.</p><p>The rule of tic-tac-toe is really simple. The whole game can be discribed as:</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre><td class="rouge-code"><pre><span class="k">for</span> <span class="p">{</span>
+	<span class="n">draw_the_board</span><span class="p">()</span>
+
+	<span class="n">row</span><span class="p">,</span> <span class="n">column</span> <span class="o">:=</span> <span class="n">enter_position_to_place_mark</span><span class="p">()</span>
+	<span class="n">place_mark</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+
+	<span class="k">if</span> <span class="n">any_one_has_won_the_game</span><span class="p">()</span> <span class="o">==</span> <span class="no">true</span> <span class="p">{</span>
+		<span class="k">break</span>
+	<span class="p">}</span>
+
+	<span class="n">next_turn</span><span class="p">()</span>
+<span class="p">}</span>
+
+</pre></table></code></div></div><h2 id="placing-mark">Placing mark</h2><p>So far we can already draw the board, but we don’t really have a <strong>proper way</strong> to place a mark on a square.<br /> When we are testing our <code class="language-plaintext highlighter-rouge">drawBoard</code> function, we modified the <code class="language-plaintext highlighter-rouge">board</code> field of gameState directly, but that’s not good enough for our game logic. We need it to be able to do a little bit more, eg. checking if a square has already had a mark on it.</p><p>Therefore we write a function to do just that:</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+</pre><td class="rouge-code"><pre><span class="c">// define error types</span>
+<span class="k">type</span> <span class="n">markAlreadyExistError</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">row</span>    <span class="kt">int</span>
+	<span class="n">column</span> <span class="kt">int</span>
+<span class="p">}</span>
+
+<span class="k">type</span> <span class="n">positionOutOfBoundError</span> <span class="k">struct</span> <span class="p">{</span>
+	<span class="n">row</span>    <span class="kt">int</span>
+	<span class="n">column</span> <span class="kt">int</span>
+<span class="p">}</span>
+
+<span class="c">// implement Error()</span>
+<span class="k">func</span> <span class="p">(</span><span class="n">e</span> <span class="o">*</span><span class="n">markAlreadyExistError</span><span class="p">)</span> <span class="n">Error</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"position (%d,%d) already has a mark on it."</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">column</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">e</span> <span class="o">*</span><span class="n">positionOutOfBoundError</span><span class="p">)</span> <span class="n">Error</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"position (%d,%d) is out of bound."</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">column</span><span class="p">)</span>
+<span class="p">}</span>
+
+<span class="c">// place a mark at a certain position</span>
+<span class="k">func</span> <span class="p">(</span><span class="n">state</span> <span class="o">*</span><span class="n">gameState</span><span class="p">)</span> <span class="n">placeMark</span><span class="p">(</span><span class="n">row</span> <span class="kt">int</span><span class="p">,</span> <span class="n">column</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="n">row</span> <span class="o">&lt;</span> <span class="m">0</span> <span class="o">||</span> <span class="n">column</span> <span class="o">&lt;</span> <span class="m">0</span> <span class="o">||</span> <span class="n">row</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">)</span> <span class="o">||</span> <span class="n">column</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="n">row</span><span class="p">])</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="o">&amp;</span><span class="n">positionOutOfBoundError</span><span class="p">{</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">}</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span> <span class="o">!=</span> <span class="n">none</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="o">&amp;</span><span class="n">markAlreadyExistError</span><span class="p">{</span><span class="n">row</span><span class="p">,</span> <span class="n">column</span><span class="p">}</span>
+	<span class="p">}</span>
+
+	<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">squareState</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">turnPlayer</span><span class="p">)</span> <span class="c">// the actual "placing"</span>
+	<span class="k">return</span> <span class="no">nil</span> <span class="c">// no error</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>You can see that aside from error handling, the code above really does nothing more than changing <code class="language-plaintext highlighter-rouge">state.board[row][column]</code>.<br /> However, in real projects, as the project grow more and more complex, instead of directly setting the value everywhere, <strong>using a function to do it allows for more flexibility and would pay off in the long run</strong>.</p><p>The code above defined two new error types <code class="language-plaintext highlighter-rouge">markAlreadyExistError</code> and <code class="language-plaintext highlighter-rouge">positionOutOfBoundError</code>. For them to be considered an <code class="language-plaintext highlighter-rouge">error</code> type, their respective <code class="language-plaintext highlighter-rouge">Error()</code> function must be implemented. That’s called <em>composition</em> (compared to <em>inheritance</em>).</p><h2 id="switching-turn">Switching turn</h2><p>Now we can place a mark on a square, what do we need next?</p><p>Well, the game has 2 players and they take turns to place marks. So after a mark is placed, we would like to switch whose mark will be placed on the next <code class="language-plaintext highlighter-rouge">placeMark()</code></p><p>We do that by adding a <code class="language-plaintext highlighter-rouge">nextTurn()</code> function, which sets <code class="language-plaintext highlighter-rouge">state.turnPlayer</code> to the other player.</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+</pre><td class="rouge-code"><pre><span class="k">type</span> <span class="n">gameResult</span> <span class="kt">int</span>
+
+<span class="k">const</span> <span class="p">(</span>
+	<span class="n">noWinnerYet</span> <span class="o">=</span> <span class="no">iota</span>
+	<span class="n">crossWon</span>
+	<span class="n">circleWon</span>
+	<span class="n">draw</span>
+<span class="p">)</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">state</span> <span class="o">*</span><span class="n">gameState</span><span class="p">)</span> <span class="n">whosNext</span><span class="p">()</span> <span class="n">player</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="n">state</span><span class="o">.</span><span class="n">turnPlayer</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="p">(</span><span class="n">state</span> <span class="o">*</span><span class="n">gameState</span><span class="p">)</span> <span class="n">nextTurn</span><span class="p">()</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">turnPlayer</span> <span class="o">==</span> <span class="n">cross</span> <span class="p">{</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">turnPlayer</span> <span class="o">=</span> <span class="n">circle</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">turnPlayer</span> <span class="o">=</span> <span class="n">cross</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+</pre></table></code></div></div><p><code class="language-plaintext highlighter-rouge">whosNext()</code> and <code class="language-plaintext highlighter-rouge">nextTurn()</code> are pretty straightforward and does exactly what it says to do.</p><h2 id="checking-for-winner">Checking for winner</h2><p>So for each and every single turn, we need to check if anyone has won the game by placing a mark. This is when we get into a more interesting part of this project.</p><h3 id="the-naive-approach">The naive approach</h3><p>You might be tempted to do something like this:</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+</pre><td class="rouge-code"><pre><span class="k">func</span> <span class="p">(</span><span class="n">state</span> <span class="o">*</span><span class="n">gameState</span><span class="p">)</span> <span class="n">checkForWinner</span><span class="p">()</span> <span class="n">gameResult</span> <span class="p">{</span>
+	<span class="c">// check vertical</span>
+	<span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">2</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">2</span><span class="p">]</span> <span class="o">!=</span> <span class="n">none</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="n">gameResult</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">0</span><span class="p">])</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">2</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">2</span><span class="p">]</span> <span class="o">!=</span> <span class="n">none</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="n">gameResult</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">0</span><span class="p">])</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">2</span><span class="p">][</span><span class="m">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">2</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">2</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">2</span><span class="p">][</span><span class="m">2</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">2</span><span class="p">][</span><span class="m">2</span><span class="p">]</span> <span class="o">!=</span> <span class="n">none</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="n">gameResult</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">2</span><span class="p">][</span><span class="m">0</span><span class="p">])</span>
+	<span class="p">}</span>
+
+	<span class="c">// check horizontal</span>
+	<span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">0</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">2</span><span class="p">][</span><span class="m">0</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">2</span><span class="p">][</span><span class="m">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">none</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="n">gameResult</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">0</span><span class="p">])</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">2</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">2</span><span class="p">][</span><span class="m">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">none</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="n">gameResult</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">1</span><span class="p">])</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">2</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">1</span><span class="p">][</span><span class="m">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">2</span><span class="p">][</span><span class="m">2</span><span class="p">]</span> <span class="o">&amp;&amp;</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">2</span><span class="p">][</span><span class="m">2</span><span class="p">]</span> <span class="o">!=</span> <span class="n">none</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="n">gameResult</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="m">0</span><span class="p">][</span><span class="m">2</span><span class="p">])</span>
+	<span class="p">}</span>
+
+	<span class="c">// check diagonal</span>
+	<span class="c">// ...</span>
+	
+	<span class="k">return</span> <span class="n">noWinnerYet</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>This DOES work, but it’s a naive way of doing it. It’s long, verbose, and hard to modify. The board can also only be 3x3 and can not be expanded easily.</p><h3 id="using-for-loops">Using for-loops</h3><p>A way better solution would be to use loops:</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre><td class="rouge-code"><pre><span class="k">func</span> <span class="p">(</span><span class="n">state</span> <span class="o">*</span><span class="n">gameState</span><span class="p">)</span> <span class="n">checkForWinner</span><span class="p">()</span> <span class="n">gameResult</span> <span class="p">{</span>
+<span class="n">CheckHorizontal</span><span class="o">:</span>
+	<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span> <span class="p">{</span>
+		<span class="k">var</span> <span class="n">lastSquare</span> <span class="n">squareState</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="m">0</span><span class="p">]</span>
+		<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">square</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">row</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="n">square</span> <span class="o">!=</span> <span class="n">lastSquare</span> <span class="p">{</span>
+				<span class="k">continue</span> <span class="n">CheckHorizontal</span> <span class="c">// continue with label, affects the outer loop instead of the inner one</span>
+			<span class="p">}</span>
+			<span class="n">lastSquare</span> <span class="o">=</span> <span class="n">square</span>
+		<span class="p">}</span>
+		<span class="k">if</span> <span class="n">lastSquare</span> <span class="o">==</span> <span class="n">cross</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="n">crossWon</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="n">lastSquare</span> <span class="o">==</span> <span class="n">circle</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="n">circleWon</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+
+	<span class="c">// check for verticals and diagonals...</span>
+
+	<span class="k">return</span> <span class="n">noWinnerYet</span>
+<span class="p">}</span>
+
+<span class="c">// (the complete code will be about 4 times as long as the code shown)</span>
+
+</pre></table></code></div></div><p>By doing it like this, we can handle board of any dimension. But due to the way the board is stored(<code class="language-plaintext highlighter-rouge">board[row][column]</code>), checking vertical lines using nested for-loops isn’t as intuitive as checking horizontal lines. And it gets even trickier when it comes to checking for diagonal lines.</p><p>Also, the function is still repetitive since the actual “checking” part inside each loop:</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre>		<span class="k">if</span> <span class="n">lastSquare</span> <span class="o">==</span> <span class="n">cross</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="n">crossWon</span>
+		<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="n">lastSquare</span> <span class="o">==</span> <span class="n">circle</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="n">circleWon</span>
+		<span class="p">}</span>
+</pre></table></code></div></div><p>are the same.</p><h3 id="a-better-approach">A better approach</h3><p>In order to know if anyone has won the game, we have to check for 3 horizontal lines, 3 vertical lines and 2 diagonal lines. We can think of the process of checking each line like this:</p><ol><li>for each iteration, check if <code class="language-plaintext highlighter-rouge">next square(x + a, y + b)</code> has the same mark as the <code class="language-plaintext highlighter-rouge">current square(x, y)</code><li>set current square position to <code class="language-plaintext highlighter-rouge">(x + a, y + b)</code><li>repeat the process until different marks between iteration was found or a border was hit.</ol><p>This is a generalized description of all the for-loops we discussed before. By using different delta <code class="language-plaintext highlighter-rouge">(a, b)</code>, we can control how we move between different iterations. So <strong>the same code can be used to check for horizontals, verticals and diagonals</strong>.</p><p>This is the implementation:</p><p>First we define a lambda function for checking one line (can be either horizontal, vertical or diagonal):</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+</pre><td class="rouge-code"><pre><span class="n">checkLine</span> <span class="o">:=</span> <span class="k">func</span><span class="p">(</span><span class="n">startRow</span> <span class="kt">int</span><span class="p">,</span> <span class="n">startColumn</span> <span class="kt">int</span><span class="p">,</span> <span class="n">deltaRow</span> <span class="kt">int</span><span class="p">,</span> <span class="n">deltaColumn</span> <span class="kt">int</span><span class="p">)</span> <span class="n">gameResult</span> <span class="p">{</span>
+	<span class="k">var</span> <span class="n">lastSquare</span> <span class="n">squareState</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="n">startRow</span><span class="p">][</span><span class="n">startColumn</span><span class="p">]</span>
+	<span class="n">row</span><span class="p">,</span> <span class="n">column</span> <span class="o">:=</span> <span class="n">startRow</span><span class="o">+</span><span class="n">deltaRow</span><span class="p">,</span> <span class="n">startColumn</span><span class="o">+</span><span class="n">deltaColumn</span>
+
+	<span class="c">// loop starts from the second square(startRow + deltaRow, startColumn + deltaColumn)</span>
+	<span class="k">for</span> <span class="n">row</span> <span class="o">&gt;=</span> <span class="m">0</span> <span class="o">&amp;&amp;</span> <span class="n">column</span> <span class="o">&gt;=</span> <span class="m">0</span> <span class="o">&amp;&amp;</span> <span class="n">row</span> <span class="o">&lt;</span> <span class="n">boardSize</span> <span class="o">&amp;&amp;</span> <span class="n">column</span> <span class="o">&lt;</span> <span class="n">boardSize</span> <span class="p">{</span>
+
+		<span class="c">// there can't be a winner if a empty square is present within the line</span>
+		<span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span> <span class="o">==</span> <span class="n">none</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="n">noWinnerYet</span>
+		<span class="p">}</span>
+
+		<span class="k">if</span> <span class="n">lastSquare</span> <span class="o">!=</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="n">noWinnerYet</span>
+		<span class="p">}</span>
+
+		<span class="n">lastSquare</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">[</span><span class="n">row</span><span class="p">][</span><span class="n">column</span><span class="p">]</span>
+		<span class="n">row</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="n">row</span><span class="o">+</span><span class="n">deltaRow</span><span class="p">,</span> <span class="n">column</span><span class="o">+</span><span class="n">deltaColumn</span>
+	<span class="p">}</span>
+
+	<span class="c">// someone has won the game</span>
+	<span class="k">if</span> <span class="n">lastSquare</span> <span class="o">==</span> <span class="n">cross</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="n">crossWon</span>
+	<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="n">lastSquare</span> <span class="o">==</span> <span class="n">circle</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="n">circleWon</span>
+	<span class="p">}</span>
+
+	<span class="k">return</span> <span class="n">noWinnerYet</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>Then we put it inside our <code class="language-plaintext highlighter-rouge">checkForWinner()</code> function, alongside some other code to utilize it.</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+</pre><td class="rouge-code"><pre><span class="k">func</span> <span class="p">(</span><span class="n">state</span> <span class="o">*</span><span class="n">gameState</span><span class="p">)</span> <span class="n">checkForWinner</span><span class="p">()</span> <span class="n">gameResult</span> <span class="p">{</span>
+	<span class="n">boardSize</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="p">)</span> <span class="c">// assuming the board is always square-shaped.</span>
+
+	<span class="c">// define a lambda function for checking one single line</span>
+	<span class="n">checkLine</span> <span class="o">:=</span> <span class="k">func</span><span class="p">(</span><span class="n">startRow</span> <span class="kt">int</span><span class="p">,</span> <span class="n">startColumn</span> <span class="kt">int</span><span class="p">,</span> <span class="n">deltaRow</span> <span class="kt">int</span><span class="p">,</span> <span class="n">deltaColumn</span> <span class="kt">int</span><span class="p">)</span> <span class="n">gameResult</span> <span class="p">{</span>
+		<span class="c">// ...</span>
+	<span class="p">}</span>
+
+	<span class="c">// check horizontal rows</span>
+	<span class="k">for</span> <span class="n">row</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">row</span> <span class="o">&lt;</span> <span class="n">boardSize</span><span class="p">;</span> <span class="n">row</span><span class="o">++</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="n">result</span> <span class="o">:=</span> <span class="n">checkLine</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">);</span> <span class="n">result</span> <span class="o">!=</span> <span class="n">noWinnerYet</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="n">result</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="c">// check vertical columns</span>
+	<span class="k">for</span> <span class="n">column</span> <span class="o">:=</span> <span class="m">0</span><span class="p">;</span> <span class="n">column</span> <span class="o">&lt;</span> <span class="n">boardSize</span><span class="p">;</span> <span class="n">column</span><span class="o">++</span> <span class="p">{</span>
+		<span class="k">if</span> <span class="n">result</span> <span class="o">:=</span> <span class="n">checkLine</span><span class="p">(</span><span class="n">column</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">);</span> <span class="n">result</span> <span class="o">!=</span> <span class="n">noWinnerYet</span> <span class="p">{</span>
+			<span class="k">return</span> <span class="n">result</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="c">// check top-left to bottom-right diagonal</span>
+	<span class="k">if</span> <span class="n">result</span> <span class="o">:=</span> <span class="n">checkLine</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">);</span> <span class="n">result</span> <span class="o">!=</span> <span class="n">noWinnerYet</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="n">result</span>
+	<span class="p">}</span>
+	<span class="c">// check top-right to bottom-left diagonal</span>
+	<span class="k">if</span> <span class="n">result</span> <span class="o">:=</span> <span class="n">checkLine</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="n">boardSize</span><span class="o">-</span><span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="o">-</span><span class="m">1</span><span class="p">);</span> <span class="n">result</span> <span class="o">!=</span> <span class="n">noWinnerYet</span> <span class="p">{</span>
+		<span class="k">return</span> <span class="n">result</span>
+	<span class="p">}</span>
+	<span class="c">// check for draw</span>
+	<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span> <span class="p">{</span>
+		<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">square</span> <span class="o">:=</span> <span class="k">range</span> <span class="n">row</span> <span class="p">{</span>
+			<span class="k">if</span> <span class="n">square</span> <span class="o">==</span> <span class="n">none</span> <span class="p">{</span>
+				<span class="k">return</span> <span class="n">noWinnerYet</span>
+			<span class="p">}</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+	<span class="c">// if no one wins yet, but none of the squares are empty</span>
+	<span class="k">return</span> <span class="n">draw</span>
+<span class="p">}</span>
+
+</pre></table></code></div></div><p>The code above uses the same <code class="language-plaintext highlighter-rouge">checkLine()</code> routine to check for horizontals, verticals and diagonals.</p><h1 id="putting-everything-together">Putting everything together</h1><p>Now that we can draw the board, place a mark, switch turns and check for potiential winners, it’s time to put everything together.</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+</pre><td class="rouge-code"><pre><span class="k">func</span> <span class="p">(</span><span class="n">e</span> <span class="n">player</span><span class="p">)</span> <span class="n">String</span><span class="p">()</span> <span class="kt">string</span> <span class="p">{</span>
+	<span class="k">switch</span> <span class="n">e</span> <span class="p">{</span>
+	<span class="k">case</span> <span class="n">none</span><span class="o">:</span>
+		<span class="k">return</span> <span class="s">"none"</span>
+	<span class="k">case</span> <span class="n">cross</span><span class="o">:</span>
+		<span class="k">return</span> <span class="s">"cross"</span>
+	<span class="k">case</span> <span class="n">circle</span><span class="o">:</span>
+		<span class="k">return</span> <span class="s">"circle"</span>
+	<span class="k">default</span><span class="o">:</span>
+		<span class="k">return</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"%d"</span><span class="p">,</span> <span class="kt">int</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">func</span> <span class="n">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">state</span> <span class="o">:=</span> <span class="n">gameState</span><span class="p">{}</span>
+	<span class="n">state</span><span class="o">.</span><span class="n">turnPlayer</span> <span class="o">=</span> <span class="n">cross</span> <span class="c">// cross goes first</span>
+
+	<span class="k">var</span> <span class="n">result</span> <span class="n">gameResult</span> <span class="o">=</span> <span class="n">noWinnerYet</span>
+
+	<span class="c">// the main game loop</span>
+	<span class="k">for</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">next player to place a mark is: %v</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">whosNext</span><span class="p">())</span>
+
+		<span class="c">// 1. draw the board onto the screen</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">drawBoard</span><span class="p">()</span>
+
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"where to place a %v? (input row then column, separated by space)</span><span class="se">\n</span><span class="s">&gt; "</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">whosNext</span><span class="p">())</span>
+
+		<span class="c">// 2. use a loop to take input</span>
+		<span class="k">for</span> <span class="p">{</span>
+			<span class="k">var</span> <span class="n">row</span><span class="p">,</span> <span class="n">column</span> <span class="kt">int</span>
+			<span class="n">fmt</span><span class="o">.</span><span class="n">Scan</span><span class="p">(</span><span class="o">&amp;</span><span class="n">row</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">column</span><span class="p">)</span>
+
+			<span class="n">e</span> <span class="o">:=</span> <span class="n">state</span><span class="o">.</span><span class="n">placeMark</span><span class="p">(</span><span class="n">row</span><span class="o">-</span><span class="m">1</span><span class="p">,</span> <span class="n">column</span><span class="o">-</span><span class="m">1</span><span class="p">)</span> <span class="c">// -1 so coordinate starts at (1,1) instead of (0,0)</span>
+
+			<span class="c">// if a valid position was entered, break out from the input loop</span>
+			<span class="k">if</span> <span class="n">e</span> <span class="o">==</span> <span class="no">nil</span> <span class="p">{</span>
+				<span class="k">break</span>
+			<span class="p">}</span>
+
+			<span class="c">// if an invalid position was entered, prompt the player to re-enter another position</span>
+			<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+			<span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"please re-enter a position:</span><span class="se">\n</span><span class="s">&gt; "</span><span class="p">)</span>
+		<span class="p">}</span>
+
+		<span class="c">// 3. check if anyone has won the game</span>
+		<span class="n">result</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">checkForWinner</span><span class="p">()</span>
+		<span class="k">if</span> <span class="n">result</span> <span class="o">!=</span> <span class="n">noWinnerYet</span> <span class="p">{</span>
+			<span class="k">break</span>
+		<span class="p">}</span>
+
+		<span class="c">// 4. if no one has won in this turn, go on for next turn and continue the game loop</span>
+		<span class="n">state</span><span class="o">.</span><span class="n">nextTurn</span><span class="p">()</span>
+
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">()</span>
+	<span class="p">}</span>
+
+	<span class="n">state</span><span class="o">.</span><span class="n">drawBoard</span><span class="p">()</span>
+
+	<span class="k">switch</span> <span class="n">result</span> <span class="p">{</span>
+	<span class="k">case</span> <span class="n">crossWon</span><span class="o">:</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"cross won the game!</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+	<span class="k">case</span> <span class="n">circleWon</span><span class="o">:</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"circle won the game!</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+	<span class="k">case</span> <span class="n">draw</span><span class="o">:</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"the game has ended with a draw!</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>Noted that we defined method <code class="language-plaintext highlighter-rouge">String()</code> for <code class="language-plaintext highlighter-rouge">player</code> type at the beginning.</p><p>This is done for the following line of code to work.</p><div class="language-go highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre><span class="n">fmt</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">next player to place a mark is: %v</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">whosNext</span><span class="p">())</span>
+</pre></table></code></div></div><p>Defining this method makes type <code class="language-plaintext highlighter-rouge">player</code> a <em>Stringer</em>, meaning something that has a <code class="language-plaintext highlighter-rouge">String()</code> method and can be converted into a string.</p><p>In this case, <code class="language-plaintext highlighter-rouge">fmt.Printf</code> uses the method internally to convert a <code class="language-plaintext highlighter-rouge">player</code> into a string, then prints it out.</p><h1 id="testing-the-game">Testing the game</h1><p>Now we compile and run the game:</p><div class="language-plaintext highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+</pre><td class="rouge-code"><pre>next player to place a mark is: cross
+   |   |  
+------------
+   |   |  
+------------
+   |   |  
+where to place a cross? (input row then column, separated by space)
+&gt; 1 1
+
+next player to place a mark is: circle
+ X |   |  
+------------
+   |   |  
+------------
+   |   |  
+where to place a circle? (input row then column, separated by space)
+&gt; 1 2
+
+...
+
+next player to place a mark is: cross
+ X | O | X
+------------
+ O | O | X
+------------
+   | X | O
+where to place a cross? (input row then column, separated by space)
+&gt; 3 1
+ X | O | X
+------------
+ O | O | X
+------------
+ X | X | O
+the game has ended with a draw!
+</pre></table></code></div></div><p>From another run:</p><div class="language-plaintext highlighter-rouge"><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre><td class="rouge-code"><pre>...
+
+next player to place a mark is: circle
+ X | X | O
+------------
+ X | O |  
+------------
+   |   |  
+where to place a circle? (input row then column, separated by space)
+&gt; 3 1
+
+ X | X | O
+------------
+ X | O |  
+------------
+ O |   |  
+circle won the game!
+</pre></table></code></div></div><p><strong>There you have it, a fully working tic-tac-toe in Go.</strong></p></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/execises/'>Execises</a>, <a href='/categories/golang/'>Golang</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/golang/" class="post-tag no-text-decoration" >golang</a> <a href="/tags/project/" class="post-tag no-text-decoration" >project</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> This post is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> by the author.</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">Share</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=Golang Project: Tic Tac Toe - Miigon's blog&url=https://blog.miigon.net/posts/golang-project-tic-tac-toe/" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=Golang Project: Tic Tac Toe - Miigon's blog&u=https://blog.miigon.net/posts/golang-project-tic-tac-toe/" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://telegram.me/share?text=Golang Project: Tic Tac Toe - Miigon's blog&url=https://blog.miigon.net/posts/golang-project-tic-tac-toe/" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i class="fa-fw fas fa-link small" onclick="copyLink()" data-toggle="tooltip" data-placement="top" title="Copy link"></i> </span></div></div></div></div><script src="https://utteranc.es/client.js" repo="miigon/blog" issue-term="pathname" label="comment" theme="github-light" crossorigin="anonymous" async> </script></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted topbar-down"><div class="access"><div id="access-lastmod" class="post"> <span>Recent Update</span><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/answering-some-questions-about-ieee-754/">关于 IEEE 754 浮点数一些设计细节的疑问解释</a><li><a href="/posts/first-announcement/">Announcement | 公告</a><li><a href="/posts/cn-translation-performance-best-practices-transactions-and-read-write-concerns/">MongoDB 高性能最佳实践: 事务，读取关心程度与写入关心程度</a><li><a href="/posts/golang-project-tic-tac-toe/">Golang Project: Tic Tac Toe</a></ul></div><div id="access-tags"> <span>Trending Tags</span><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/golang/">golang</a> <a class="post-tag" href="/tags/learning/">learning</a> <a class="post-tag" href="/tags/chinese/">Chinese</a> <a class="post-tag" href="/tags/announcement/">announcement</a> <a class="post-tag" href="/tags/c/">C++</a> <a class="post-tag" href="/tags/computer-system/">computer system</a> <a class="post-tag" href="/tags/project/">project</a> <a class="post-tag" href="/tags/tools/">tools</a> <a class="post-tag" href="/tags/translated/">translated</a></div></div><div id="access-links" class="post"> <span>Links</span><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="http://0xffff.one">0xffff.one 华南师大搬砖技术社区</a><li><a href="https://blog.izgq.net">ZGQ's Blog</a></ul></div></div><div id="toc-wrapper" class="pl-0 pr-4 mb-5"> <span class="pl-3 pt-2 mb-2">Contents</span><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div class="col-12 col-lg-11 col-xl-8"><div id="post-extend-wrapper" class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-md-4 pr-md-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>Further Reading</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/golang-starting-my-journey/"><div class="card-body"> <span class="timeago small" > Dec 22, 2020 <i class="unloaded">2020-12-22T10:22:00+08:00</i> </span><h3 class="pt-0 mt-1 mb-3" data-toc-skip>Golang: Starting my journey</h3><div class="text-muted small"><p> Golang Disclaimer: This series is meant to compare the features and quirks of Golang with other languages like C, because that’s basically how I learned the language. However, this means that...</p></div></div></a></div><div class="card"> <a href="/posts/golang-packages/"><div class="card-body"> <span class="timeago small" > Dec 22, 2020 <i class="unloaded">2020-12-22T13:46:00+08:00</i> </span><h3 class="pt-0 mt-1 mb-3" data-toc-skip>Golang: Packages - Introduction</h3><div class="text-muted small"><p> Packages - Introduction Every Go program is made up of packages. Note: Do not get confused with Go modules, which is Go’s dependency management system. A Go modules usually contains one or mor...</p></div></div></a></div><div class="card"> <a href="/posts/golang-functions/"><div class="card-body"> <span class="timeago small" > Dec 22, 2020 <i class="unloaded">2020-12-22T15:02:00+08:00</i> </span><h3 class="pt-0 mt-1 mb-3" data-toc-skip>Golang: Functions</h3><div class="text-muted small"><p> Functions Reader of this blog is assumed to have some basic programming skills. So in this series, we will not get into basic things like how function works. Because it’s basically the same for ev...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/golang-control-structures/" class="btn btn-outline-primary"><p>Golang: Control structures</p></a> <a href="/posts/cn-translation-performance-best-practices-transactions-and-read-write-concerns/" class="btn btn-outline-primary"><p>MongoDB 高性能最佳实践: 事务，读取关心程度与写入关心程度</p></a></div></div></div></div><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lozad/dist/lozad.min.js"></script> <script type="text/javascript"> const imgs = document.querySelectorAll('#post-wrapper img'); const observer = lozad(imgs); observer.observe(); </script><footer class="d-flex w-100 justify-content-center"><div class="d-flex justify-content-between align-items-center"><div class="footer-left"><p class="mb-0"> © 2021 <a href="https://github.com/Miigon">Miigon</a>. <span data-toggle="tooltip" data-placement="top" title="Except where otherwise noted, the blog posts on this site are licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) License by the author.">Some rights reserved.</span></p></div><div class="footer-right"><p class="mb-0"> Powered by <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> with <a href="https://github.com/cotes2020/jekyll-theme-chirpy/" target="_blank" rel="noopener">Customized Chirpy</a> theme.</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-xl-11 post-content"><div id="search-hints"><h4 class="text-muted mb-4">Trending Tags</h4><a class="post-tag" href="/tags/golang/">golang</a> <a class="post-tag" href="/tags/learning/">learning</a> <a class="post-tag" href="/tags/chinese/">Chinese</a> <a class="post-tag" href="/tags/announcement/">announcement</a> <a class="post-tag" href="/tags/c/">C++</a> <a class="post-tag" href="/tags/computer-system/">computer system</a> <a class="post-tag" href="/tags/project/">project</a> <a class="post-tag" href="/tags/tools/">tools</a> <a class="post-tag" href="/tags/translated/">translated</a></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a> <script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.7.3/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="https://blog.miigon.net{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"><div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>{categories}</div><div><i class="fa fa-tag fa-fw"></i>{tags}</div></div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">Oops! No result founds.</p>' }); </script>
