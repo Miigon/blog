@@ -2,7 +2,7 @@
 title: Announcement | 公告
 date: 2020-12-19 16:25:00 +0800
 categories: [Announcement, Uncategorized]
-tags: [announcemet]
+tags: [announcement]
 ---
 
 # What?
