@@ -1,12 +1,12 @@
 ---
-title: "同步与异步 gRPC API 的区别"
+title: "[StackOverflow] 同步与异步 gRPC API 的区别"
 date: 2021-08-20 23:09:00 +0800
 categories: [Backend, Networking, gRPC]
 tags: [c++, gRPC]
 ---
 
 > ------
-> 转自 [我的一个 StackOverflow 回答](https://stackoverflow.com/a/68771426/7509248).
+> 转自 [我的一个 StackOverflow 回答](https://stackoverflow.com/a/68771426/7509248)。因为答案比较长，而且感觉比较有意义，就翻译成了中文发了出来。
 > 
 > 原问题:
 > ------
