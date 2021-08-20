@@ -1,5 +1,5 @@
 ---
-title: "[StackOverflow] 同步与异步 gRPC API 的区别"
+title: "[StackOverflow] C++ gRPC 异步 API 实例与优势"
 date: 2021-08-20 23:09:00 +0800
 categories: [Backend, Networking, gRPC]
 tags: [c++, gRPC]
