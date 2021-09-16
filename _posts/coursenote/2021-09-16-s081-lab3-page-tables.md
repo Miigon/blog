@@ -17,7 +17,7 @@ tags: [operating system]
 
 In this lab you will explore page tables and modify them to simplify the functions that copy data from user space to kernel space.
 
-对 xv6 添加一些新的系统调用，帮助加深对 xv6 内核的理解。
+探索页表，修改页表以简化从用户态拷贝数据到内核态的方法。
 
 ## Print a page table (easy)
 
