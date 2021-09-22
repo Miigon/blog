@@ -774,7 +774,7 @@ time: OK
 Score: 66/66
 ```
 
-# Optional challenges
+## Optional challenges
 
 * Use super-pages to reduce the number of PTEs in page tables.（跳过）
 * Extend your solution to support user programs that are as large as possible; that is, eliminate the restriction that user programs be smaller than PLIC.（跳过）
