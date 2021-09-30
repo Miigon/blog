@@ -4,7 +4,7 @@ date: 2021-10-01 06:26:00 +0800
 categories: [Course Notes, MIT6.S081]
 tags: [operating system]
 ---
-> 这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第四篇：Lazy page allocation。此 lab 大致耗时：5小时。  
+> 这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第五篇：Lazy page allocation。此 lab 大致耗时：5小时。  
 > 
 > 课程地址：[https://pdos.csail.mit.edu/6.S081/2020/schedule.html](https://pdos.csail.mit.edu/6.S081/2020/schedule.html)  
 > Lab 地址：[https://pdos.csail.mit.edu/6.S081/2020/labs/lazy.html](https://pdos.csail.mit.edu/6.S081/2020/labs/lazy.html)  
