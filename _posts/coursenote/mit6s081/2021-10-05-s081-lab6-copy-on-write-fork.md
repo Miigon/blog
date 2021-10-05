@@ -1,5 +1,5 @@
 ---
-title: "[mit6.s081] 笔记 Lab5: Copy-on-write fork | fork 懒拷贝"
+title: "[mit6.s081] 笔记 Lab6: Copy-on-write fork | fork 懒拷贝"
 date: 2021-10-05 15:21:00 +0800
 categories: [Course Notes, MIT6.S081]
 tags: [operating system]
