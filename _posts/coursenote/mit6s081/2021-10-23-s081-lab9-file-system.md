@@ -13,7 +13,7 @@ tags: [operating system]
 > 
 > 本文中代码注释是编写博客的时候加入的，原仓库中的代码可能缺乏注释或代码不完全相同。  
 
-# Lab 8: File Systems
+# Lab 9: File Systems
 
 为 xv6 的文件系统添加大文件以及符号链接支持。该 lab 难度较低。
 
