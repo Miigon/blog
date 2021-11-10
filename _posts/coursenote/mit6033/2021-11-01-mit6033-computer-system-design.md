@@ -7,8 +7,8 @@ tags: [system design]
 
 # MIT6.033 Computer System Design (Spring 2021)
 > 前置课程：
-> * 6.004 Computation Structures | 计算架构
-> * 6.006 Introduction to Algorithms | 算法导论
+> * 6.004 Computation Structures｜计算架构
+> * 6.006 Introduction to Algorithms｜算法导论
 > 
 > ps. 本课 6.033 Computer System Design 和 6.S081 Operating System Engineering 共同作为 6.824 Distributed Systems 的前置课。
 
