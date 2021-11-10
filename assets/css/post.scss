@@ -69,6 +69,9 @@ $prompt-newer: "{{ site.data.label.post.button.next }}";
     margin-bottom: 2.5rem;
     @include align-center;
   }
+  %section { // miigonmod: improve title readibility
+    font-weight: 500;
+  }
 }
 
 .post-tail-wrapper {
