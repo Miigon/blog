@@ -20,7 +20,7 @@ How do modules of a system communicate if they're on separate machines? 网络�
 ### 不同机器上模块的通信 - 网络
 
 网络：包含 end point，以及将这些 end point 连接在一起的中间节点 switch 以及边 link 形成的图
-![[Pasted image 20211112031936.png]]
+![](/assets/img/mit6033/post2/Pasted image 20211112031936.png)
 
 随着系统增长，需要考虑如何将这些链接转化成一个「网络」
 
@@ -81,7 +81,7 @@ what can go wrong when things get big?
 - 目标：让每个交换机知道，任何两节点之间的**最低开销(minimum-cost)路径**
 - cost：可以是任意指标或多指标的综合，如延迟、吞吐、拥塞、流量价格。可动态变化。
 
-![[Pasted image 20211115103755.png]]
+![](/assets/img/mit6033/post2/Pasted image 20211115103755.png)
 
 - 路径path：整个从起点A到终点D的完整路径
 - 路由route：当前点A到终点D的路径中，作出的一次hop称为一个route（在A到D的例子中，就是第一步A->C的这个hop，即route只关心当前节点以及下一节点，不关心整条链路）
@@ -102,7 +102,7 @@ what can go wrong when things get big?
 #### link state routing (eg. OSPF)
 
 节点A在探测到自己的所有邻居后，将尝试使用flooding洪流式公告，尝试将自己的邻居信息告诉网络中的所有其他节点。
-![[Pasted image 20211125081837.png]]
+![](/assets/img/mit6033/post2/Pasted image 20211125081837.png)
 每一个节点收到A的公告后，都会进一步地转发给自己的邻居节点，所以称作“flooding”，洪水一样地在网络里不断转发（like 广度优先搜索）。
 
 等到所有的节点都进行过flooding后，所有节点都知道了所有其他节点的邻居，也就构建出来网络的拓扑结构了。可以进一步在网络上跑最短路算法。
@@ -182,7 +182,7 @@ TCP：端到端协议，smart端系统，dumb交换机（交换机只负责在�
 拥塞控制：通过控制滑动窗口大小，方式：AIMD（线性增加，倍数回退）
 
 ### 额外机制
-![[Pasted image 20211126121100.png]]
+![](/assets/img/mit6033/post2/Pasted image 20211126121100.png)
 - slow start（实际上是快启动，启动阶段指数放大window size，直到出现丢包为止开始回退。相比一开始就跑大窗口来说是“slow start”）
 - 快速重传/快速恢复（有时通过重复ACK可以直接推断某个包丢失，则可以直接开始重传而不需要等待超时）
 
@@ -267,7 +267,7 @@ ps. 为每个队列加上最大令牌数量限制，就几乎是令牌桶算法�
 在因特网上分发内容content delivery。（最早期的互联网应用！）
 
 ### 文件分发的可选方案
-![[Pasted image 20211130220115.png]]
+![](/assets/img/mit6033/post2/Pasted image 20211130220115.png)
 - Client/Server
 	- eg：FTP/HTTP
 	- 缺点：单点故障（single point of failure）；不能 scale。
