@@ -1,6 +1,6 @@
 ---
 title: "[mit6.033] 第一部分 LEC 1-6 Operating Systems 笔记"
-date: 2021-11-01 04:45:00 +0800
+date: 2021-11-11 04:45:00 +0800
 categories: [Course Notes, MIT6.033]
 tags: [system design]
 ---
