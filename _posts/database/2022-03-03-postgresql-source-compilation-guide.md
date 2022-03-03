@@ -102,10 +102,12 @@ make install
 1. 执行 `initdb` 初始化数据库：  
 ![](/assets/img/database/pg-comp-guide/7.7.png)
 
-2. 执行 `pg_ctl -D ~/PGDev/pghome/../data -l ~/PGDev/logfile start` 启动 PostgreSQL 服务（注意这里的指令和 initdb 后 PostgreSQL 提示的指令不同）：  
+2. 执行 `pg_ctl -D ~/PGDev/pghome/../data -l ~/PGDev/logfile start` 启动 PostgreSQL 服务：  
+（**注意这里的指令和上图提示的指令不同**）  
 ![](/assets/img/database/pg-comp-guide/8.png)
 
-3. 执行 `createdb` 创建数据库，再执行 `psql` 进行连接：（这两个指令后面都可带参数来指定数据库名，不带则默认同用户名，建议不带参数。）  
+3. 执行 `createdb` 创建数据库，再执行 `psql` 进行连接：  
+（这两个指令后面都可带参数来指定数据库名，不带则默认同用户名，建议不带参数。）  
 ![](/assets/img/database/pg-comp-guide/10.png)
 
 此时应该就可以正常使用了：
