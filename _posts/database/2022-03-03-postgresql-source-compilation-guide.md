@@ -102,7 +102,7 @@ make install
 1. 执行 `initdb` 初始化数据库：  
 ![](/assets/img/database/pg-comp-guide/7.7.png)
 
-2. 执行 `pg_ctl -D ~/PGDev/pghome/../data -l ~/PGDev/logfile start` 启动 PostgreSQL 服务：  
+2. 执行 `pg_ctl -D $PGDATA -l $PGDATA/logfile start` 启动 PostgreSQL 服务：  
 （**注意这里的指令和上图提示的指令不同**）  
 ![](/assets/img/database/pg-comp-guide/8.png)
 
@@ -116,7 +116,7 @@ make install
 
 ## 后记
 
-1. 这样安装后，PostgreSQL 本体会在 `~/PGDev/pghome` 中，数据会在 `~/PGDev/data` 中。
+1. 这样安装后，PostgreSQL 本体会在 `~/PGDev/pghome` 中（PGHOME），数据会在 `~/PGDev/data` 中（PGDATA）。
 2. **后续如果对源代码作出修改，只需要在 `~/PGDev/postgresql-12.5` 中再次执行 make 与 make install 即可。**
 3. 建议使用 git 对 `postgresql-12.5` 文件夹进行版本管理，方便后续修改回退。
 4. **如果关闭了当前终端，打开新终端后需要先执行一次 `source ~/PGDev/env-debug`，否则会提示找不到 psql 等错误。**
