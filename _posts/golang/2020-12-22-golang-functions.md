@@ -1,7 +1,7 @@
 ---
 title: "Golang: Functions"
 date: 2020-12-22 15:02:00 +0800
-categories: [Language Learning, Golang]
+categories: [Language, Golang]
 tags: [golang, learning]
 ---
 

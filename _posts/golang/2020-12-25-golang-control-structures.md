@@ -1,7 +1,7 @@
 ---
 title: "Golang: Control structures"
 date: 2020-12-25 00:07:00 +0800
-categories: [Language Learning, Golang]
+categories: [Language, Golang]
 tags: [golang, learning]
 ---
 

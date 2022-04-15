@@ -1,7 +1,7 @@
 ---
 title: "Golang: Starting my journey"
 date: 2020-12-22 10:22:00 +0800
-categories: [Language Learning, Golang]
+categories: [Language, Golang]
 tags: [golang, learning]
 ---
 
