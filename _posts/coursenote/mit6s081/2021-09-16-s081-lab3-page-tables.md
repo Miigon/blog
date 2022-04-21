@@ -498,7 +498,7 @@ kvmcopymappings(pagetable_t src, pagetable_t dst, uint64 start, uint64 sz)
   uint64 pa, i;
   uint flags;
 
-  // PGROUNDUP: 对齐页边界，防止 remap
+  // PGROUNDUP: prevent re-mapping already mapped pages (eg. when doing growproc)
   for(i = PGROUNDUP(start); i < start + sz; i += PGSIZE){
     if((pte = walk(src, i, 0)) == 0)
       panic("kvmcopymappings: pte should exist");
@@ -516,7 +516,9 @@ kvmcopymappings(pagetable_t src, pagetable_t dst, uint64 start, uint64 sz)
   return 0;
 
  err:
-  uvmunmap(dst, 0, i / PGSIZE, 0);
+  // thanks @hdrkna for pointing out a mistake here.
+  // original code incorrectly starts unmapping from 0 instead of PGROUNDUP(start)
+  uvmunmap(dst, PGROUNDUP(start), (i - PGROUNDUP(start)) / PGSIZE, 0);
   return -1;
 }
 
