@@ -68,8 +68,10 @@ source env-debug
 ## 8. 执行 configure（autoconf）
 cd 进入 `postgresql-12.5`，执行：
 ```
-./configure --prefix=$PGHOME
+./configure --prefix=$PGHOME --enable-debug
 ```
+> UPDATE: 2022-07 增加 --enable-debug 选项，方便后续 gdb 调试  
+
 ![](/assets/img/database/pg-comp-guide/7.3.png)
 
 （确保执行时路径正确）
