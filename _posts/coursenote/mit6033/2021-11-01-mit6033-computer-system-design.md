@@ -49,7 +49,7 @@ Recitations 给学生一个练习系统分析与口语交流技能的机会。�
 > Note: 主要面向 MIT 学生需要团队完成的学期大作业 design project。该作业要求学生三人组队设计一个自己的系统以解决一个现实世界中的问题。现实世界中的系统都不是由一个人独立构建的，总是团队协作的成果。design project 包含报告、演示、peer review 等环节，感兴趣的可以前往 [Design Project 页面](https://web.mit.edu/6.033/www/dp.shtml) 查看。
 
 ## 课程资源
-课程网站：https://web.mit.edu/6.033/www/
+课程网站：https://web.mit.edu/6.033/2021/wwwdocs/
 课本：https://ocw.mit.edu/resources/res-6-004-principles-of-computer-system-design-an-introduction-spring-2009/
 
 > 很可惜，据我所知目前还没有中文课程翻译。
