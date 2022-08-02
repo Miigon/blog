@@ -46,7 +46,7 @@ Recitations 给学生一个练习系统分析与口语交流技能的机会。�
 ### Writing Tutorials
 这些教程将教你关于这门课的沟通的理论以及实践，并帮助你为作业（尤其是 design project）做好准备。你将会流畅掌握不同的沟通流派，培养将技术概念展现给不同听众所需要的策略与技能，学习如何使用写作来培养以及加深你的技术理解。
 
-> Note: 主要面向 MIT 学生需要团队完成的学期大作业 design project。该作业要求学生三人组队设计一个自己的系统以解决一个现实世界中的问题。现实世界中的系统都不是由一个人独立构建的，总是团队协作的成果。design project 包含报告、演示、peer review 等环节，感兴趣的可以前往 [Design Project 页面](https://web.mit.edu/6.033/www/dp.shtml) 查看。
+> Note: 主要面向 MIT 学生需要团队完成的学期大作业 design project。该作业要求学生三人组队设计一个自己的系统以解决一个现实世界中的问题。现实世界中的系统都不是由一个人独立构建的，总是团队协作的成果。design project 包含报告、演示、peer review 等环节，感兴趣的可以前往 [Design Project 页面](https://web.mit.edu/6.033/2021/wwwdocs/dp.shtml) 查看。
 
 ## 课程资源
 课程网站：https://web.mit.edu/6.033/2021/wwwdocs/
@@ -64,41 +64,41 @@ TUT: writing tutorials
 > 操作系统如何在「单主机」的范围内施行模块化。
 
 #### Lectures
-**LEC 1:** [Enforced Modularity via Client/server Organization](https://web.mit.edu/6.033/www/lec/l01.shtml)  
-**LEC 2:** [Naming](https://web.mit.edu/6.033/www/lec/l02.shtml)  
-**LEC 3:** [Virtual memory](https://web.mit.edu/6.033/www/lec/l03.shtml)  
-**LEC 4:** [Bounded buffers and locks](https://web.mit.edu/6.033/www/lec/l04.shtml)  
-**LEC 5:** [Threads](https://web.mit.edu/6.033/www/lec/l05.shtml)  
-**LEC 6:** [OS structure, Virtual Machines](https://web.mit.edu/6.033/www/lec/l06.shtml) 
+**LEC 1:** [Enforced Modularity via Client/server Organization](https://web.mit.edu/6.033/2021/wwwdocs/lec/l01.shtml)  
+**LEC 2:** [Naming](https://web.mit.edu/6.033/2021/wwwdocs/lec/l02.shtml)  
+**LEC 3:** [Virtual memory](https://web.mit.edu/6.033/2021/wwwdocs/lec/l03.shtml)  
+**LEC 4:** [Bounded buffers and locks](https://web.mit.edu/6.033/2021/wwwdocs/lec/l04.shtml)  
+**LEC 5:** [Threads](https://web.mit.edu/6.033/2021/wwwdocs/lec/l05.shtml)  
+**LEC 6:** [OS structure, Virtual Machines](https://web.mit.edu/6.033/2021/wwwdocs/lec/l06.shtml) 
 
 #### Recitations
-**REC 1:** [Introduction to 6.033 Recitations](https://web.mit.edu/6.033/www/recitations/01-intro.shtml)  
-**REC 2:** [We Did Nothing Wrong](https://web.mit.edu/6.033/www/recitations/02-wrong.shtml)  
-**REC 3:** [DNS](https://web.mit.edu/6.033/www/recitations/03-dns.shtml)  
-**REC 4:** [UNIX](https://web.mit.edu/6.033/www/recitations/04-unix.shtml)  
-**REC 5:** [UNIX](https://web.mit.edu/6.033/www/recitations/05-unix.shtml)  
-**REC 6:** [DP Discussion](https://web.mit.edu/6.033/www/recitations/06-dp.shtml)  
+**REC 1:** [Introduction to 6.033 Recitations](https://web.mit.edu/6.033/2021/wwwdocs/recitations/01-intro.shtml)  
+**REC 2:** [We Did Nothing Wrong](https://web.mit.edu/6.033/2021/wwwdocs/recitations/02-wrong.shtml)  
+**REC 3:** [DNS](https://web.mit.edu/6.033/2021/wwwdocs/recitations/03-dns.shtml)  
+**REC 4:** [UNIX](https://web.mit.edu/6.033/2021/wwwdocs/recitations/04-unix.shtml)  
+**REC 5:** [UNIX](https://web.mit.edu/6.033/2021/wwwdocs/recitations/05-unix.shtml)  
+**REC 6:** [DP Discussion](https://web.mit.edu/6.033/2021/wwwdocs/recitations/06-dp.shtml)  
 
 ### Networking
 > 多机系统的机器之间数据与请求是如何交换的。如何放大规模。
 
 #### Lectures
-**LEC 7:** [Intro to networking and layering](https://web.mit.edu/6.033/www/lec/l07.shtml)    
-**LEC 8:** [Network Layer: Routing](https://web.mit.edu/6.033/www/lec/l08.shtml)  
-**LEC 9:** [BGP](https://web.mit.edu/6.033/www/lec/l09.shtml)  
-**LEC 10:** [Transport Layer: TCP](https://web.mit.edu/6.033/www/lec/l10.shtml)  
-**LEC 11:** [In-network Resource Management](https://web.mit.edu/6.033/www/lec/l11.shtml)  
-**LEC 12:** [Application Layer](https://web.mit.edu/6.033/www/lec/l12.shtml)  
+**LEC 7:** [Intro to networking and layering](https://web.mit.edu/6.033/2021/wwwdocs/lec/l07.shtml)    
+**LEC 8:** [Network Layer: Routing](https://web.mit.edu/6.033/2021/wwwdocs/lec/l08.shtml)  
+**LEC 9:** [BGP](https://web.mit.edu/6.033/2021/wwwdocs/lec/l09.shtml)  
+**LEC 10:** [Transport Layer: TCP](https://web.mit.edu/6.033/2021/wwwdocs/lec/l10.shtml)  
+**LEC 11:** [In-network Resource Management](https://web.mit.edu/6.033/2021/wwwdocs/lec/l11.shtml)  
+**LEC 12:** [Application Layer](https://web.mit.edu/6.033/2021/wwwdocs/lec/l12.shtml)  
 **LEC 13:** Canceled  
-**EXAM**: [Midterm](https://web.mit.edu/6.033/www/assignments/exam-1.shtml)
+**EXAM**: [Midterm](https://web.mit.edu/6.033/2021/wwwdocs/assignments/exam-1.shtml)
 
 #### Recitations
-**REC 7:** [Ethernet](https://web.mit.edu/6.033/www/recitations/07-ethernet.shtml)  
-**REC 8:** [Encapsulation](https://web.mit.edu/6.033/www/recitations/08-encapsulation.shtml)  
-**REC 9:** [Overlay Networks (RON)](https://web.mit.edu/6.033/www/recitations/09-ron.shtml)  
-**REC 10:** [Performance, Measurement, and Evaluation (RON)](https://web.mit.edu/6.033/www/recitations/10-ron.shtml)  
-**REC 11:** [DCTCP](https://web.mit.edu/6.033/www/recitations/11-dctcp.shtml)  
-**REC 12:** [End-to-end Arguments](https://web.mit.edu/6.033/www/recitations/12-e2e.shtml)  
+**REC 7:** [Ethernet](https://web.mit.edu/6.033/2021/wwwdocs/recitations/07-ethernet.shtml)  
+**REC 8:** [Encapsulation](https://web.mit.edu/6.033/2021/wwwdocs/recitations/08-encapsulation.shtml)  
+**REC 9:** [Overlay Networks (RON)](https://web.mit.edu/6.033/2021/wwwdocs/recitations/09-ron.shtml)  
+**REC 10:** [Performance, Measurement, and Evaluation (RON)](https://web.mit.edu/6.033/2021/wwwdocs/recitations/10-ron.shtml)  
+**REC 11:** [DCTCP](https://web.mit.edu/6.033/2021/wwwdocs/recitations/11-dctcp.shtml)  
+**REC 12:** [End-to-end Arguments](https://web.mit.edu/6.033/2021/wwwdocs/recitations/12-e2e.shtml)  
 **REC 13:** Canceled  
 
 
@@ -106,48 +106,48 @@ TUT: writing tutorials
 > 通过网络连接的分布式系统中可能会遇到什么问题/错误，如何应对。
 
 #### Lectures
-**LEC 14:** [Reliability](https://web.mit.edu/6.033/www/lec/l14.shtml)  
-**LEC 15:** [Transactions](https://web.mit.edu/6.033/www/lec/l15.shtml)  
-**LEC 16:** [Logging](https://web.mit.edu/6.033/www/lec/l16.shtml)  
-**LEC 17:** [Isolation](https://web.mit.edu/6.033/www/lec/l17.shtml)  
-**LEC 18:** [Distributed Transactions](https://web.mit.edu/6.033/www/lec/l18.shtml)  
-**LEC 19:** [Replication](https://web.mit.edu/6.033/www/lec/l19.shtml)  
+**LEC 14:** [Reliability](https://web.mit.edu/6.033/2021/wwwdocs/lec/l14.shtml)  
+**LEC 15:** [Transactions](https://web.mit.edu/6.033/2021/wwwdocs/lec/l15.shtml)  
+**LEC 16:** [Logging](https://web.mit.edu/6.033/2021/wwwdocs/lec/l16.shtml)  
+**LEC 17:** [Isolation](https://web.mit.edu/6.033/2021/wwwdocs/lec/l17.shtml)  
+**LEC 18:** [Distributed Transactions](https://web.mit.edu/6.033/2021/wwwdocs/lec/l18.shtml)  
+**LEC 19:** [Replication](https://web.mit.edu/6.033/2021/wwwdocs/lec/l19.shtml)  
 
 #### Recitations
-**REC 14:** [GFS](https://web.mit.edu/6.033/www/recitations/14-gfs.shtml)  
-**REC 15:** [MapReduce](https://web.mit.edu/6.033/www/recitations/15-mapreduce.shtml)  
-**REC 16:** [ZFS](https://web.mit.edu/6.033/www/recitations/16-zfs.shtml)  
+**REC 14:** [GFS](https://web.mit.edu/6.033/2021/wwwdocs/recitations/14-gfs.shtml)  
+**REC 15:** [MapReduce](https://web.mit.edu/6.033/2021/wwwdocs/recitations/15-mapreduce.shtml)  
+**REC 16:** [ZFS](https://web.mit.edu/6.033/2021/wwwdocs/recitations/16-zfs.shtml)  
 **REC 17:** Canceled  
-**REC 18:** [Consistency Guarantees](https://web.mit.edu/6.033/www/recitations/18-baseball.shtml)  
-**REC 19:** [Raft](https://web.mit.edu/6.033/www/recitations/19-raft.shtml)  
+**REC 18:** [Consistency Guarantees](https://web.mit.edu/6.033/2021/wwwdocs/recitations/18-baseball.shtml)  
+**REC 19:** [Raft](https://web.mit.edu/6.033/2021/wwwdocs/recitations/19-raft.shtml)  
 
 ### Security
 #### Lectures
-**LEC 20:** [Intro to Security + Authentication](https://web.mit.edu/6.033/www/lec/l20.shtml)  
-**LEC 21:** [Low-level attacks](https://web.mit.edu/6.033/www/lec/l21.shtml)  
-**LEC 22:** [Secure Channels](https://web.mit.edu/6.033/www/lec/l22.shtml)  
-**LEC 23:** [ToR](https://web.mit.edu/6.033/www/lec/l23.shtml)  
-**LEC 24:** [Network Attacks](https://web.mit.edu/6.033/www/lec/l24.shtml)  
-**LEC 25:** [Wrap-up](https://web.mit.edu/6.033/www/lec/l25.shtml)  
-**EXAM**: [Final exam](https://web.mit.edu/6.033/www/assignments/exam-2.shtml)
+**LEC 20:** [Intro to Security + Authentication](https://web.mit.edu/6.033/2021/wwwdocs/lec/l20.shtml)  
+**LEC 21:** [Low-level attacks](https://web.mit.edu/6.033/2021/wwwdocs/lec/l21.shtml)  
+**LEC 22:** [Secure Channels](https://web.mit.edu/6.033/2021/wwwdocs/lec/l22.shtml)  
+**LEC 23:** [ToR](https://web.mit.edu/6.033/2021/wwwdocs/lec/l23.shtml)  
+**LEC 24:** [Network Attacks](https://web.mit.edu/6.033/2021/wwwdocs/lec/l24.shtml)  
+**LEC 25:** [Wrap-up](https://web.mit.edu/6.033/2021/wwwdocs/lec/l25.shtml)  
+**EXAM**: [Final exam](https://web.mit.edu/6.033/2021/wwwdocs/assignments/exam-2.shtml)
 
 #### Recitations
-**REC 20:** [Raft](https://web.mit.edu/6.033/www/recitations/20-raft.shtml)  
-**REC 21:** [Meltdown](https://web.mit.edu/6.033/www/recitations/21-meltdown.shtml)  
-**REC 22:** [DNSSEC](https://web.mit.edu/6.033/www/recitations/22-dnssec.shtml)  
+**REC 20:** [Raft](https://web.mit.edu/6.033/2021/wwwdocs/recitations/20-raft.shtml)  
+**REC 21:** [Meltdown](https://web.mit.edu/6.033/2021/wwwdocs/recitations/21-meltdown.shtml)  
+**REC 22:** [DNSSEC](https://web.mit.edu/6.033/2021/wwwdocs/recitations/22-dnssec.shtml)  
 **REC 23:** Canceled  
-**REC 24:** [Mirai](https://web.mit.edu/6.033/www/recitations/24-mirai.shtml)  
+**REC 24:** [Mirai](https://web.mit.edu/6.033/2021/wwwdocs/recitations/24-mirai.shtml)  
 
 
 ### Writing Tutorials
-**TUT 1:** [Intro to 6.033 Communication](https://web.mit.edu/6.033/www/tutorials/01-intro.shtml)  
-**TUT 2:** [Consensus and Reasoning About Systems](https://web.mit.edu/6.033/www/tutorials/02-consensus.shtml)  
-**TUT 3:** [Reading for Systems Concepts](https://web.mit.edu/6.033/www/tutorials/03-systems.shtml)  
-**TUT 4:** [Collaboration and Collaborative Writing](https://web.mit.edu/6.033/www/tutorials/04-collaboration.shtml)  
-**TUT 5:** [Visual Design, Figures, and Diagrams](https://web.mit.edu/6.033/www/tutorials/05-design.shtml)  
-**TUT 6:** [Assembling the DPPR](https://web.mit.edu/6.033/www/tutorials/06-dppr.shtml)  
-**TUT 7:** [DP Presentation](https://web.mit.edu/6.033/www/tutorials/07-presentation.shtml)  
-**TUT 8:** [Responding to Feedback](https://web.mit.edu/6.033/www/tutorials/08-feedback.shtml)   
+**TUT 1:** [Intro to 6.033 Communication](https://web.mit.edu/6.033/2021/wwwdocs/tutorials/01-intro.shtml)  
+**TUT 2:** [Consensus and Reasoning About Systems](https://web.mit.edu/6.033/2021/wwwdocs/tutorials/02-consensus.shtml)  
+**TUT 3:** [Reading for Systems Concepts](https://web.mit.edu/6.033/2021/wwwdocs/tutorials/03-systems.shtml)  
+**TUT 4:** [Collaboration and Collaborative Writing](https://web.mit.edu/6.033/2021/wwwdocs/tutorials/04-collaboration.shtml)  
+**TUT 5:** [Visual Design, Figures, and Diagrams](https://web.mit.edu/6.033/2021/wwwdocs/tutorials/05-design.shtml)  
+**TUT 6:** [Assembling the DPPR](https://web.mit.edu/6.033/2021/wwwdocs/tutorials/06-dppr.shtml)  
+**TUT 7:** [DP Presentation](https://web.mit.edu/6.033/2021/wwwdocs/tutorials/07-presentation.shtml)  
+**TUT 8:** [Responding to Feedback](https://web.mit.edu/6.033/2021/wwwdocs/tutorials/08-feedback.shtml)   
 **TUT 9:** Analysis and Evaluation  
-**TUT 10:** [Peer Review](https://web.mit.edu/6.033/www/tutorials/10-peerreview.shtml)  
+**TUT 10:** [Peer Review](https://web.mit.edu/6.033/2021/wwwdocs/tutorials/10-peerreview.shtml)  
 **TUT 11:** Final DP Report  
