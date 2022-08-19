@@ -1,11 +1,9 @@
 ---
 layout: page
 # The layout for Tag page
-# v2.0
-# https://github.com/cotes2020/jekyll-theme-chirpy
-# © 2017-2019 Cotes Chung
-# MIT Licensed
 ---
+
+{% include lang.html %}
 
 <div id="page-tag">
   <h1 class="pl-lg-2">
@@ -18,7 +16,7 @@ layout: page
     <li class="d-flex justify-content-between pl-md-3 pr-md-3">
       <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
       <span class="dash flex-grow-1"></span>
-      <span class="text-muted small">{{ post.date | date: site.data.date_format.post.long }}</span>
+      {% include datetime.html date=post.date wrap='span' class='text-muted small' %}
     </li>
     {% endfor %}
   </ul>

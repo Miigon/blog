@@ -1,0 +1,14 @@
+  <div id="access-links" class="post">
+    <div class="panel-heading">{{- site.data.locales[lang].panel.links -}}</div>
+    <ul class="post-content pl-0 pb-1 ml-1 mt-2">
+
+    {% for item in site.data.links %}
+      <!-- {% assign index = item | split: "::" | last | plus: 0 %}
+      {% assign post = site.posts[index] %}
+      {% assign url = post.url | relative_url %} -->
+      <!-- {% assign url = item.url %} --> 
+      <li><a href="{{ item.url }}">{{ item.title }}</a></li>
+    {% endfor %}
+
+    </ul>
+  </div> <!-- #access-links -->

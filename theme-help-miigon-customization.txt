@@ -1,0 +1,5 @@
+remote `chirpy-theme` should be git@github.com:cotes2020/jekyll-theme-chirpy.git
+branch `theme-production-upstream` should be set to track chirpy-theme/production
+
+use following command to upgrade theme:
+	git merge theme-production-upstream --squash --allow-unrelated-histories

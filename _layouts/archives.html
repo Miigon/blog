@@ -1,13 +1,17 @@
 ---
 layout: page
-
 # The Archives of posts.
-# v2.0
-# https://github.com/cotes2020/jekyll-theme-chirpy
-# © 2017-2019 Cotes Chung
-# MIT License
 ---
 
+{% include lang.html %}
+
+{% if site.prefer_datetime_locale == 'en' or lang == 'en' %}
+  {% assign df_strftime_m = '%b' %}
+  {% assign df_dayjs_m = 'MMM' %}
+{% else %}
+  {% assign df_strftime_m = '/ %m' %}
+  {% assign df_dayjs_m = '/ MM' %}
+{% endif %}
 
 <div id="archives" class="pl-xl-2">
 {% for post in site.posts %}
@@ -21,10 +25,13 @@ layout: page
   {% endif %}
     <li>
       <div>
-        {% capture this_day %}{{ post.date | date: "%d" }}{% endcapture %}
-        {% capture this_month %}{{ post.date | date: "%b" }}{% endcapture %}
-        <span class="date day">{{ this_day }}</span>
-        <span class="date month small text-muted">{{ this_month }}</span>
+        {% assign ts = post.date | date: '%s' %}
+        <span class="date day" data-ts="{{ ts }}" data-df="DD">
+          {{ post.date | date: "%d" }}
+        </span>
+        <span class="date month small text-muted" data-ts="{{ ts }}" data-df="{{ df_dayjs_m }}">
+          {{ post.date | date: df_strftime_m }}
+        </span>
         <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
       </div>
     </li>
