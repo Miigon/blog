@@ -2,7 +2,7 @@
 title: "MIT6.033 Computer System Design | 计算机系统设计"
 date: 2021-11-01 02:19:00 +0800
 categories: [Course Notes, MIT6.033]
-tags: [system design]
+tags: [system design, course recommendation]
 ---
 
 # MIT6.033 Computer System Design (Spring 2021)
@@ -10,7 +10,7 @@ tags: [system design]
 > * 6.004 Computation Structures 计算架构
 > * 6.006 Introduction to Algorithms 算法导论
 > 
-> ps. 本课 6.033 Computer System Design 和 6.S081 Operating System Engineering 共同作为 6.824 Distributed Systems 的前置课。
+> ps. 本课 6.033 Computer System Design 和 [6.S081 Operating System Engineering](/categories/mit6-s081/) 共同作为 6.824 Distributed Systems 的前置课。
 
 ## 课程介绍
 MIT6.033 Computer System Design 是麻省理工学院计算机科学本科的必修课程，课程涵盖了计算机软件系统与硬件系统的工程设计：控制复杂度的技巧、利用客户-服务设计保证强模块性、操作系统、性能、网络、命名、安全与隐私、容错系统、原子性以及并发活动协调、错误恢复等。

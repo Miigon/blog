@@ -2,12 +2,12 @@
 title: "MIT6.830 Database Systems | 数据库系统"
 date: 2022-08-24 18:24:00 +0800
 categories: [Course Notes, MIT6.830]
-tags: [system design, database]
+tags: [system design, database, course recommendation]
 ---
 
 # MIT6.830 Database Systems (Spring 2021)
 > 前置课程：
-> - 6.033 Computer System Design 计算机系统设计
+> - [6.033 Computer System Design 计算机系统设计](/posts/mit6033-computer-system-design/)
 > 
 > 这门课与MIT 6.814是同一门课程，两者区别在于Final Project在6.814中由Lab5以及Lab6替代。虽然这门课是研究生课程，但是在MIT里，这门课大概1/3的学生是本科生。
 
