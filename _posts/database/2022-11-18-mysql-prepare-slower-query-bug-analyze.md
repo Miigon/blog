@@ -196,20 +196,20 @@ bool const_expression_in_where(Item *cond, Item *comp_item,
 
 > 注（与主问题无关）：仅仅满足 `xxx` 是常量并不足以保证结果集中的 `col` 的值唯一，因为在 `col` 的类型和 `xxx` 不一致的时候，会出现 type cast 自动类型转换。
 > 比如当 `col` 的类型是 string，而 `xxx` 是个 int 的时候，可能会出现如下情况：
-```
-mysql> insert into t2 values("123"),("123a"),("123bbbc");
-Query OK, 3 rows affected (0.01 sec)
-
-mysql> select * from t2 where col = 123;
-+---------+
-| col     |
-+---------+
-| 123     |
-| 123a    |
-| 123bbbc |
-+---------+
-3 rows in set (0.03 sec)
-```
+> ```
+> mysql> insert into t2 values("123"),("123a"),("123bbbc");
+> Query OK, 3 rows affected (0.01 sec)
+> 
+> mysql> select * from t2 where col = 123;
+> +---------+
+> | col     |
+> +---------+
+> | 123     |
+> | 123a    |
+> | 123bbbc |
+> +---------+
+> 3 rows in set (0.03 sec)
+> ```
 > 这是由于 col 的值在和 123 做比较的时候，会将两者都 typecast 成 double，然后再进行比较，string cast 到 double 的时候，会丢弃掉尾部无效字符，`123bbbc` 会只剩下 `123`，导致`"123bbbc" = 123` 结果为 true。
 > 这里的条件 `col = 123` 就是一个等号右侧为常量，但是还是无法保证结果集中该列的「值唯一」的例子。
 > https://dev.mysql.com/doc/refman/8.0/en/type-conversion.html
