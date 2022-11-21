@@ -21,7 +21,7 @@ MySQL 中，语句执行有两种方式，分别是 [Text Protocol](https://dev.
 定位并简化问题查询，得到最小可复现样例：
 
 表结构：
-```mysql
+```sql
 CREATE TABLE t1 (
 	col1 BIGINT NOT NULL,
 	
@@ -30,7 +30,7 @@ CREATE TABLE t1 (
 ```
 
 查询：
-```mysql
+```sql
 SELECT * FROM t1 WHERE col1=10036 ORDER BY col1 ASC LIMIT 5;
 ```
 
@@ -247,7 +247,7 @@ static bool test_if_equality_guarantees_uniqueness(const Item *l,
 这里是问题所在。
 
 回到一开始的例子中：
-```mysql
+```sql
 SELECT * FROM t1 WHERE col1 = 10036 ORDER BY col1 ASC LIMIT 5;
 ```
 
@@ -311,7 +311,7 @@ $82 = true
 
 
 Item类实际上也提供了一个方法用来判断某个 item 是不是同一次 execution 内是常量，这个就包括了 `?` 占位符的情况：
-```mysql
+```sql
 /**
   Returns true if item is constant during one query execution.
   If const_for_execution() is true but const_item() is false, value is
