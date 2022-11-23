@@ -11,7 +11,7 @@ on:
 jobs:
   continuous-delivery:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     env:
       GEMS_PATH: ~/vendor/bundle
