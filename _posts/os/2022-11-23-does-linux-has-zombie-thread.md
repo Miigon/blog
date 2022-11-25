@@ -1,5 +1,5 @@
 ---
-title: "Linux 是否有 zombie thread？源码探究分析"
+title: "Linux 是否有 zombie thread？从glibc和内核源码探究"
 date: 2022-11-23 17:47:00 +0800
 categories: [Linux]
 tags: [Chinese, linux]
