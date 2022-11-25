@@ -5,7 +5,7 @@ categories: [Linux]
 tags: [Chinese, linux]
 ---
 
-系统编程课上遇到的一个问题：Linux下，如果一个 `pthread_create` 创建的线程没有被 `pthread_join` 回收，是否会和僵尸进程一样，产生“僵尸**线程**”？
+系统编程课上遇到的一个问题：Linux下，如果一个 `pthread_create` 创建的线程没有被 `pthread_join` 回收，是否会和僵尸进程一样，产生“僵尸**线程**”，并一直占用一个 pid/tid？
 
 # 猜想
  
@@ -611,7 +611,7 @@ static void exit_notify(struct task_struct *tsk, int group_dead)
 
 `pthread_detach()` 过的线程，则 pthread 会在线程执行完成后自动释放 pthread 结构体以及栈，所以对不关心执行结果的线程，应当使用 `pthread_detach()` 进行脱离。若不进行脱离，则必须确保所有线程在合适的时间都能被 `pthread_join()` 回收。
 
-> Reference:
-> <https://manpages.debian.org/bullseye/manpages-dev/clone.2.en.html#CLONE_THREAD>
-> <https://codebrowser.dev/glibc/glibc/nptl/>
-> <https://elixir.bootlin.com/linux/v5.15/source/kernel/exit.c>
+> Reference:  
+> <https://manpages.debian.org/bullseye/manpages-dev/clone.2.en.html#CLONE_THREAD>  
+> <https://codebrowser.dev/glibc/glibc/nptl/>  
+> <https://elixir.bootlin.com/linux/v5.15/source/kernel/exit.c>  
