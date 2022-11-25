@@ -1,5 +1,5 @@
 ---
-title: "MySQL Prepare后语句查询性能降低 源码bug排查分析"
+title: "MySQL Prepare后语句查询性能降低 内核源码bug排查分析"
 date: 2022-11-18 18:00:00 +0800
 categories: [Backend, Database, MySQL]
 tags: [Chinese, MySQL]
