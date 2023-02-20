@@ -45,11 +45,14 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
     if((*pte & PTE_V) == 0)
       panic("uvmcopy: page not present");
     pa = PTE2PA(*pte);
-    // 清除父进程的 PTE_W 标志位，设置 PTE_COW 标志位表示是一个懒复制页（多个进程引用同个物理页）
-    *pte = (*pte & ~PTE_W) | PTE_COW;
+    if(*pte & PTE_W) {
+      // 清除父进程的 PTE_W 标志位，设置 PTE_COW 标志位表示是一个懒复制页（多个进程引用同个物理页）
+      *pte = (*pte & ~PTE_W) | PTE_COW;
+    }
     flags = PTE_FLAGS(*pte);
     // 将父进程的物理页直接 map 到子进程 （懒复制）
-    // 权限设置和父进程一致（不可写，PTE_COW）
+    // 权限设置和父进程一致
+    // （不可写+PTE_COW，或者如果父进程页本身单纯只读非 COW，则子进程页同样只读且无 COW 标识）
     if(mappages(new, i, PGSIZE, (uint64)pa, flags) != 0){
       goto err;
     }
@@ -64,6 +67,10 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
 }
 
 ```
+
+> UPDATE 2023-02-20: 上述代码一开始的版本没有考虑只读页的拷贝，会导致单纯的非 COW 只读页被错误标记为 COW 页从而变成可写。  
+> 这里给出的代码[已经修复该问题](https://github.com/Miigon/my-xv6-labs-2020/commit/c119f033881ffe19f4000d0149043e717304f659)，感谢 [@zztaki](https://github.com/zztaki) 指出该问题。  
+> 修复后，只读页会直接共享物理页，并参与引用计数，但是不会被打上 COW 标记。
 
 上面用到了 PTE_COW 标志位，用于标示一个映射对应的物理页是否是懒复制页。这里 PTE_COW 需要在 riscv.h 中定义：
 
@@ -117,13 +124,27 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 {
   uint64 n, va0, pa0;
 
-  if(uvmcheckcowpage(dstva))
-    uvmcowcopy(dstva);
+  while(len > 0){
+    if(uvmcheckcowpage(dstva)) // 检查每一个被写的页是否是 COW 页
+      uvmcowcopy(dstva);
+    va0 = PGROUNDDOWN(dstva);
+    pa0 = walkaddr(pagetable, va0);
+    
+    // .......memmove from src to pa0
+
+    len -= n;
+    src += n;
+    dstva = va0 + PGSIZE;
+  }
 
   // ......
 }
 
 ```
+
+> UPDATE 2023-02-20: 上述代码原始版本只检查了第一个目标页的 COW 状态，对于跨越多页的 copyout，如果目标页中有多个 COW 页，只有刚好在地址范围开头的第一个页会被检查，导致共享页被误写。
+> 感谢 [@zztaki](https://github.com/zztaki) 指出该问题，这里给出的代码[已经修复该问题](https://github.com/Miigon/my-xv6-labs-2020/commit/c119f033881ffe19f4000d0149043e717304f659)。
+> 该版本对每一个目标页，在写入之前都对 COW 标志位进行检查。
 
 实现懒复制页的检测（`uvmcheckcowpage()`）与实复制（`uvmcowcopy()`）操作：
 
