@@ -9,7 +9,7 @@ tags: [discussion]
 
 以及重点是讨论了目前对这个常见问题的解决办法的探索（静态分析存在的不足，以及2022年10月 Golang 官方提出的直接更改 for 循环变量语义，从语言设计上根本地消除这个问题的 proposal）
 
-## background
+# background
 这个问题是一个 Golang 从很早版本就一直存在的设计选择造成的。
 
 简单地讲就是 for 循环中，由于 func 捕获，或者显式/隐式的取引用，对循环变量产生了引用并且这个引用逃逸出了当前循环迭代（iteration）的生命周期范围。而由于 Golang 一开始决定将将循环变量（i、k、v）的生命周期定义为整个循环，而不是每个迭代都有新一份的循环变量，导致了每一轮迭代产生的引用实际上都指向同一个值，而不是指向每一轮各自对应的值。
@@ -63,7 +63,7 @@ golang 的循环变量是 per loop 的，而不是 per iteration 的。如果对
 
 如果这个指针/引用被逃逸出了一次迭代的范围内（比如 append 到了一个数组里，或者被go/defer后面的闭包capture了），因为所有 iteration 里取到的指针都是同一个，指向的对象也都会是同一个（最后一轮iteration的结果）。
 
-## workaround
+# workaround
 ```go
  	for _, a := range alarms {
 +		a := a
@@ -74,7 +74,7 @@ golang 的循环变量是 per loop 的，而不是 per iteration 的。如果对
 
 问题是很多时候很难知道某个循环是否需要写这么一行拷贝，导致很容易因为遗漏而产生bug。另一个极端是有的开发者因为担心遗漏，选择过度矫正，把所有的循环都写上这一句拷贝，使得代码可读性降低。
 
-## vet? static analysis?
+# vet? static analysis?
 go vet 或其他 static analysis 方案虽然能帮助找到很明显的错误场景，但是由于静态分析并不能完全100%理解程序逻辑，在没有 proof 某个循环变量指针一定会超出 iteration 范围的前提下，会出现 false positive。
 
 > 并不能单用逃逸分析，根据引用是否逃逸来判定是否会出问题。
@@ -85,7 +85,7 @@ go vet 或其他 static analysis 方案虽然能帮助找到很明显的错误�
 
 静态分析的问题是分析无法透过一些运行时功能，比如 interface 方法，比如 reflection。只能理解相对简单的代码。
 
-## sematics fix
+# sematics fix
 问题的本质是 golang 设计之初，决定将循环变量设定为 per loop 的而不是 per iteration 的。想要根除这个问题，需要在语义层面修复。即将循环变量设定为 per iteration。
 
 Russ Cox（rsc）在2022年10月的时候，重新提出了这个话题：
@@ -130,16 +130,16 @@ rsc 提到了，在Golang进入Go1版本之前就已经讨论过这个问题，�
 
 之前 Golang 社区尝试通过文档和工具的方式，尝试防止用户因为这个语义而写出 bug 代码。但是实际实践中已经证明了，这种方式并不是非常有效，即使是语言的老手也经常不经意写出问题代码。
 
-### the official fix
+## the official fix
 在 <https://github.com/golang/go/discussions/56010> 中提到的，从根本上彻底解决这个问题的方案是，将循环变量（三段式循环以及range循环）改为 per iteration。概念上等同于，在每个 iteration 开始时，将原本 per loop 的循环变量拷贝一份，并且在每个 iteration 结束时拷贝回去。
 
 这样，每一轮 iteration 取到的地址都会是不同的地址。
 
 而这个 sematic change 会通过 go.mod 来判断是否启用，旧的项目的行为照旧完全不变。
 
-### effects of migrating to new semantics
+## effects of migrating to new semantics
 
-#### Google's Go Tests
+### Google's Go Tests
 
 > 目前（2023-03）这个提案还没有被正式确定引入 Golang 中。这里提到的结果都是 Golang 团队测试/实验的结果。
 
@@ -158,7 +158,7 @@ rsc 提到了，在Golang进入Go1版本之前就已经讨论过这个问题，�
 
 两个都非常地容易修复。
 
-#### perspective: csharp's migration to per-iteration loop vars
+### perspective: csharp's migration to per-iteration loop vars
 
 C# 团队中的 [@jaredpar](https://github.com/jaredpar) （负责处理 customer feedback 的主要人物）提供了视角：
 
@@ -170,7 +170,7 @@ C#5 的时候也做过类似的更改，将 foreach 的循环变量从 per-loop 
 
 C# 作出这个更改已经10年了，jaredpar 的原话：”I'm honestly struggling to remember the last time I worked with a customer hitting this.“ （this 指更改语义造成的代码 break）
 
-### more
+# more
 
 本文摘选以及翻译/总结自 Golang 官方仓库 Discussion 中对于该话题的帖子 <https://github.com/golang/go/discussions/56010> 。完整的讨论请前往原链接。（原讨论帖 17 天内收到了 241条回复，由于社区反馈已经比较充足，新回复基本上也是旧回复的重复，原讨论帖已被 lock）
 
