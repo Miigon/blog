@@ -1,5 +1,5 @@
 ---
-title: "[原创] git的前世，和BitKeeper"
+title: "git的前世，和BitKeeper"
 date: 2022-04-02 22:10:00 +0800
 categories: [Misc, Unix]
 tags: [git]
