@@ -9,7 +9,7 @@ tags: [filesystem, hash]
 
 # 原贴
 
-原贴：<https://0xffff.one/d/1395-wen-jian-xi-tong-zuo-wei-huan-cun>
+这是我在 0xffff 论坛的回帖的备档：<https://0xffff.one/d/1395-wen-jian-xi-tong-zuo-wei-huan-cun>
 
 一个常见的业务场景，需要实现一个 Key-Value Cache Storage，除了 Redis 等外，有一个方向是用设备本身的文件系统来落地。
 
