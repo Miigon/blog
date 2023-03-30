@@ -1,0 +1,783 @@
+<!DOCTYPE html><html lang="en" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="generator" content="Jekyll v4.2.2" /><meta property="og:title" content="[mit6.s081] 笔记 Lab10: Mmap 文件内存映射" /><meta property="og:locale" content="en" /><meta name="description" content="这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第十篇：Mmap。此 lab 大致耗时：6小时。 课程地址：https://pdos.csail.mit.edu/6.S081/2020/schedule.html Lab 地址：https://pdos.csail.mit.edu/6.S081/2020/labs/mmap.html 我的代码地址：https://github.com/Miigon/my-xv6-labs-2020/tree/mmap Commits: https://github.com/Miigon/my-xv6-labs-2020/commits/mmap 本文中代码注释是编写博客的时候加入的，原仓库中的代码可能缺乏注释或代码不完全相同。" /><meta property="og:description" content="这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第十篇：Mmap。此 lab 大致耗时：6小时。 课程地址：https://pdos.csail.mit.edu/6.S081/2020/schedule.html Lab 地址：https://pdos.csail.mit.edu/6.S081/2020/labs/mmap.html 我的代码地址：https://github.com/Miigon/my-xv6-labs-2020/tree/mmap Commits: https://github.com/Miigon/my-xv6-labs-2020/commits/mmap 本文中代码注释是编写博客的时候加入的，原仓库中的代码可能缺乏注释或代码不完全相同。" /><link rel="canonical" href="https://blog.miigon.net/posts/s081-lab10-mmap/" /><meta property="og:url" content="https://blog.miigon.net/posts/s081-lab10-mmap/" /><meta property="og:site_name" content="Miigon’s blog" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2021-10-24T06:51:00+08:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="[mit6.s081] 笔记 Lab10: Mmap 文件内存映射" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2021-10-24T06:51:00+08:00","datePublished":"2021-10-24T06:51:00+08:00","description":"这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第十篇：Mmap。此 lab 大致耗时：6小时。 课程地址：https://pdos.csail.mit.edu/6.S081/2020/schedule.html Lab 地址：https://pdos.csail.mit.edu/6.S081/2020/labs/mmap.html 我的代码地址：https://github.com/Miigon/my-xv6-labs-2020/tree/mmap Commits: https://github.com/Miigon/my-xv6-labs-2020/commits/mmap 本文中代码注释是编写博客的时候加入的，原仓库中的代码可能缺乏注释或代码不完全相同。","headline":"[mit6.s081] 笔记 Lab10: Mmap 文件内存映射","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.miigon.net/posts/s081-lab10-mmap/"},"url":"https://blog.miigon.net/posts/s081-lab10-mmap/"}</script><title>[mit6.s081] 笔记 Lab10: Mmap | 文件内存映射 | Miigon's blog</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="Miigon's blog"><meta name="application-name" content="Miigon's blog"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.googleapis.com" ><link rel="dns-prefetch" href="https://fonts.googleapis.com" ><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="dns-prefetch" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://fonts.googleapis.com" ><link rel="dns-prefetch" href="https://fonts.googleapis.com" ><link rel="preconnect" href="https://cdn.jsdelivr.net" ><link rel="dns-prefetch" href="https://cdn.jsdelivr.net" ><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato&family=Source+Sans+Pro:wght@400;600;700;900&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get MODE_ATTR() { return "data-mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } static get ID() { return "mode-toggle"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } let self = this; /* always follow the system prefers */ this.sysDarkPrefers.addEventListener("change", () => { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.notify(); }); } /* constructor() */ get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode === ModeToggle.DARK_MODE; } get isLightMode() { return this.mode === ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer)) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } setDark() { $('html').attr(ModeToggle.MODE_ATTR, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_ATTR, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_ATTR); sessionStorage.removeItem(ModeToggle.MODE_KEY); } /* Notify another plugins that the theme mode has changed */ notify() { window.postMessage({ direction: ModeToggle.ID, message: this.modeStatus }, "*"); } } /* ModeToggle */ const toggle = new ModeToggle(); function flipMode() { if (toggle.hasMode) { if (toggle.isSysDarkPrefer) { if (toggle.isLightMode) { toggle.clearMode(); } else { toggle.setLight(); } } else { if (toggle.isDarkMode) { toggle.clearMode(); } else { toggle.setDark(); } } } else { if (toggle.isSysDarkPrefer) { toggle.setLight(); } else { toggle.setDark(); } } toggle.notify(); } /* flipMode() */ </script><body data-spy="scroll" data-target="#toc" data-topbar-visible="true"><div id="sidebar" class="d-flex flex-column align-items-end"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" class="mx-auto"> <img src="/assets/img/avatar.png" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">Miigon's blog</a></div><div class="site-subtitle font-italic">My ideas, thoughts and experiences</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>HOME</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>CATEGORIES</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tag ml-xl-3 mr-xl-3 unloaded"></i> <span>TAGS</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>ARCHIVES</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle ml-xl-3 mr-xl-3 unloaded"></i> <span>ABOUT</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <button class="mode-toggle btn" aria-label="Switch Mode"> <i class="fas fa-adjust"></i> </button> <span class="icon-border"></span> <a href="https://github.com/Miigon" aria-label="github" target="_blank" rel="noopener"> <i class="fab fa-github-alt"></i> </a> <a href="https://twitter.com/" aria-label="twitter" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['miigon.pg','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="https://stackoverflow.com/users/7509248/miigon" aria-label="stack-overflow" target="_blank" rel="noopener"> <i class="fab fa-stack-overflow"></i> </a></div></div><div id="topbar-wrapper"><div id="topbar" class="container d-flex align-items-center justify-content-between h-100 pl-3 pr-3 pl-md-4 pr-md-4"> <span id="breadcrumb"> <span> <a href="/"> Home </a> </span> <span>[mit6.s081] 笔记 Lab10: Mmap | 文件内存映射</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> Post</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="Search..."> </span> <span id="search-cancel" >Cancel</span></div></div><div id="main-wrapper" class="d-flex justify-content-center"><div id="main" class="container pl-xl-4 pr-xl-4"><div class="row"><div id="core-wrapper" class="col-12 col-lg-11 col-xl-9 pr-xl-4"><div class="post pl-1 pr-1 pl-md-2 pr-md-2"><h1 data-toc-skip>[mit6.s081] 笔记 Lab10: Mmap | 文件内存映射</h1><div class="post-meta text-muted"> <span> Posted <em class="" data-ts="1635029460" data-df="ll" data-toggle="tooltip" data-placement="bottom"> Oct 24, 2021 </em> </span><div class="d-flex justify-content-between"> <span> By <em> <a href="https://github.com/Miigon">Miigon</a> </em> </span><div> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="3230 words"> <em>17 min</em> read</span></div></div></div><div class="post-content"><blockquote><p>这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第十篇：Mmap。此 lab 大致耗时：6小时。</p><p>课程地址：<a href="https://pdos.csail.mit.edu/6.S081/2020/schedule.html">https://pdos.csail.mit.edu/6.S081/2020/schedule.html</a><br /> Lab 地址：<a href="https://pdos.csail.mit.edu/6.S081/2020/labs/mmap.html">https://pdos.csail.mit.edu/6.S081/2020/labs/mmap.html</a><br /> 我的代码地址：<a href="https://github.com/Miigon/my-xv6-labs-2020/tree/mmap">https://github.com/Miigon/my-xv6-labs-2020/tree/mmap</a><br /> Commits: <a href="https://github.com/Miigon/my-xv6-labs-2020/commits/mmap">https://github.com/Miigon/my-xv6-labs-2020/commits/mmap</a></p><p>本文中代码注释是编写博客的时候加入的，原仓库中的代码可能缺乏注释或代码不完全相同。</p></blockquote><h1 id="lab-10-mmap-hard">Lab 10: mmap (hard)</h1><p>实现 *nix 系统调用 mmap 的简单版：支持将文件映射到一片用户虚拟内存区域内，并且支持将对其的修改写回磁盘。</p><p>这里涉及的操作系统基本概念是「虚存」，mmap 指令除了可以用来将文件映射到内存上，还可以用来将创建的进程间共享内存映射到当前进程的地址空间内。本 lab 只需实现前一功能即可。</p><h2 id="代码实现"><span class="mr-2">代码实现</span><a href="#代码实现" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>首先需要在用户的地址空间内，找到一片空闲的区域，用于映射 mmap 页。</p><p><img data-src="/assets/img/mit6s081-lab10-useraddrspace.png" alt="User Address Space" data-proofer-ignore></p><p>查阅 <a href="https://pdos.csail.mit.edu/6.S081/2020/xv6/book-riscv-rev1.pdf">the xv6 book</a>，可以看到 xv6 对用户的地址空间的分配中，heap 的范围一直从 stack 到 trapframe。由于进程本身所使用的内存空间是从低地址往高地址生长的（sbrk 调用）。</p><p>为了尽量使得 map 的文件使用的地址空间不要和进程所使用的地址空间产生冲突，我们选择将 mmap 映射进来的文件 map 到尽可能高的位置，也就是刚好在 trapframe 下面。并且若有多个 mmap 的文件，则向下生长。</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+</pre><td class="rouge-code"><pre><span class="c1">// kernel/memlayout.h</span>
+
+<span class="c1">// map the trampoline page to the highest address,</span>
+<span class="c1">// in both user and kernel space.</span>
+<span class="cp">#define TRAMPOLINE (MAXVA - PGSIZE)
+</span>
+<span class="c1">// map kernel stacks beneath the trampoline,</span>
+<span class="c1">// each surrounded by invalid guard pages.</span>
+<span class="cp">#define KSTACK(p) (TRAMPOLINE - ((p)+1)* 2*PGSIZE)
+</span>
+<span class="c1">// User memory layout.</span>
+<span class="c1">// Address zero first:</span>
+<span class="c1">//   text</span>
+<span class="c1">//   original data and bss</span>
+<span class="c1">//   fixed-size stack</span>
+<span class="c1">//   expandable heap</span>
+<span class="c1">//   ...</span>
+<span class="c1">//   mmapped files</span>
+<span class="c1">//   TRAPFRAME (p-&gt;trapframe, used by the trampoline)</span>
+<span class="c1">//   TRAMPOLINE (the same page as in the kernel)</span>
+<span class="cp">#define TRAPFRAME (TRAMPOLINE - PGSIZE)
+</span><span class="c1">// MMAP 所能使用的最后一个页+1</span>
+<span class="cp">#define MMAPEND TRAPFRAME
+</span></pre></table></code></div></div><p>接下来定义 vma 结构体，其中包含了 mmap 映射的内存区域的各种必要信息，比如开始地址、大小、所映射文件、文件内偏移以及权限等。</p><p>并且在 proc 结构体末尾为每个进程加上 16 个 vma 空槽。</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+</pre><td class="rouge-code"><pre><span class="c1">// kernel/proc.h</span>
+
+<span class="k">struct</span> <span class="n">vma</span> <span class="p">{</span>
+  <span class="kt">int</span> <span class="n">valid</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">vastart</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">sz</span><span class="p">;</span>
+  <span class="k">struct</span> <span class="n">file</span> <span class="o">*</span><span class="n">f</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">prot</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">flags</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">offset</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="cp">#define NVMA 16
+</span>
+<span class="c1">// Per-process state</span>
+<span class="k">struct</span> <span class="n">proc</span> <span class="p">{</span>
+  <span class="k">struct</span> <span class="n">spinlock</span> <span class="n">lock</span><span class="p">;</span>
+
+  <span class="c1">// p-&gt;lock must be held when using these:</span>
+  <span class="k">enum</span> <span class="n">procstate</span> <span class="n">state</span><span class="p">;</span>        <span class="c1">// Process state</span>
+  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">parent</span><span class="p">;</span>         <span class="c1">// Parent process</span>
+  <span class="kt">void</span> <span class="o">*</span><span class="n">chan</span><span class="p">;</span>                  <span class="c1">// If non-zero, sleeping on chan</span>
+  <span class="kt">int</span> <span class="n">killed</span><span class="p">;</span>                  <span class="c1">// If non-zero, have been killed</span>
+  <span class="kt">int</span> <span class="n">xstate</span><span class="p">;</span>                  <span class="c1">// Exit status to be returned to parent's wait</span>
+  <span class="kt">int</span> <span class="n">pid</span><span class="p">;</span>                     <span class="c1">// Process ID</span>
+
+  <span class="c1">// these are private to the process, so p-&gt;lock need not be held.</span>
+  <span class="n">uint64</span> <span class="n">kstack</span><span class="p">;</span>               <span class="c1">// Virtual address of kernel stack</span>
+  <span class="n">uint64</span> <span class="n">sz</span><span class="p">;</span>                   <span class="c1">// Size of process memory (bytes)</span>
+  <span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">;</span>       <span class="c1">// User page table</span>
+  <span class="k">struct</span> <span class="n">trapframe</span> <span class="o">*</span><span class="n">trapframe</span><span class="p">;</span> <span class="c1">// data page for trampoline.S</span>
+  <span class="k">struct</span> <span class="n">context</span> <span class="n">context</span><span class="p">;</span>      <span class="c1">// swtch() here to run process</span>
+  <span class="k">struct</span> <span class="n">file</span> <span class="o">*</span><span class="n">ofile</span><span class="p">[</span><span class="n">NOFILE</span><span class="p">];</span>  <span class="c1">// Open files</span>
+  <span class="k">struct</span> <span class="n">inode</span> <span class="o">*</span><span class="n">cwd</span><span class="p">;</span>           <span class="c1">// Current directory</span>
+  <span class="kt">char</span> <span class="n">name</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>               <span class="c1">// Process name (debugging)</span>
+  <span class="k">struct</span> <span class="n">vma</span> <span class="n">vmas</span><span class="p">[</span><span class="n">NVMA</span><span class="p">];</span>       <span class="c1">// virtual memory areas</span>
+<span class="p">};</span>
+
+</pre></table></code></div></div><p>实现 mmap 系统调用。函数原型请参考 <code class="language-plaintext highlighter-rouge">man mmap</code>。函数的功能是在进程的 16 个 vma 槽中，找到可用的空槽，并且顺便计算所有 vma 中使用到的最低的虚拟地址（作为新 vma 的结尾地址 vaend，开区间），然后将当前文件映射到该最低地址下面的位置（vastart = vaend - sz）。</p><p>最后记得使用 <code class="language-plaintext highlighter-rouge">filedup(v-&gt;f);</code>，将文件的引用计数增加一。</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+</pre><td class="rouge-code"><pre><span class="c1">// kernel/sysfile.c</span>
+
+<span class="n">uint64</span>
+<span class="nf">sys_mmap</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">uint64</span> <span class="n">addr</span><span class="p">,</span> <span class="n">sz</span><span class="p">,</span> <span class="n">offset</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">prot</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">fd</span><span class="p">;</span> <span class="k">struct</span> <span class="n">file</span> <span class="o">*</span><span class="n">f</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">argaddr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">addr</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">argaddr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">sz</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">argint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">prot</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span>
+    <span class="o">||</span> <span class="n">argint</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">flags</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">argfd</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">fd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">f</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">argaddr</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">offset</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">sz</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  
+  <span class="k">if</span><span class="p">((</span><span class="o">!</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">readable</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">prot</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">PROT_READ</span><span class="p">)))</span>
+     <span class="o">||</span> <span class="p">(</span><span class="o">!</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">writable</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">prot</span> <span class="o">&amp;</span> <span class="n">PROT_WRITE</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">MAP_PRIVATE</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  
+  <span class="n">sz</span> <span class="o">=</span> <span class="n">PGROUNDUP</span><span class="p">(</span><span class="n">sz</span><span class="p">);</span>
+
+  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
+  <span class="k">struct</span> <span class="n">vma</span> <span class="o">*</span><span class="n">v</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">vaend</span> <span class="o">=</span> <span class="n">MMAPEND</span><span class="p">;</span> <span class="c1">// non-inclusive</span>
+  
+  <span class="c1">// mmaptest never passed a non-zero addr argument.</span>
+  <span class="c1">// so addr here is ignored and a new unmapped va region is found to</span>
+  <span class="c1">// map the file</span>
+  <span class="c1">// our implementation maps file right below where the trapframe is,</span>
+  <span class="c1">// from high addresses to low addresses.</span>
+
+  <span class="c1">// Find a free vma, and calculate where to map the file along the way.</span>
+  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">NVMA</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">vma</span> <span class="o">*</span><span class="n">vv</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">vmas</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">vv</span><span class="o">-&gt;</span><span class="n">valid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span><span class="p">(</span><span class="n">v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">vmas</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+        <span class="c1">// found free vma;</span>
+        <span class="n">v</span><span class="o">-&gt;</span><span class="n">valid</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">vv</span><span class="o">-&gt;</span><span class="n">vastart</span> <span class="o">&lt;</span> <span class="n">vaend</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">vaend</span> <span class="o">=</span> <span class="n">PGROUNDDOWN</span><span class="p">(</span><span class="n">vv</span><span class="o">-&gt;</span><span class="n">vastart</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+    <span class="n">panic</span><span class="p">(</span><span class="s">"mmap: no free vma"</span><span class="p">);</span>
+  <span class="p">}</span>
+  
+  <span class="n">v</span><span class="o">-&gt;</span><span class="n">vastart</span> <span class="o">=</span> <span class="n">vaend</span> <span class="o">-</span> <span class="n">sz</span><span class="p">;</span>
+  <span class="n">v</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">=</span> <span class="n">sz</span><span class="p">;</span>
+  <span class="n">v</span><span class="o">-&gt;</span><span class="n">prot</span> <span class="o">=</span> <span class="n">prot</span><span class="p">;</span>
+  <span class="n">v</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">=</span> <span class="n">flags</span><span class="p">;</span>
+  <span class="n">v</span><span class="o">-&gt;</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span><span class="p">;</span> <span class="c1">// assume f-&gt;type == FD_INODE</span>
+  <span class="n">v</span><span class="o">-&gt;</span><span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span><span class="p">;</span>
+
+  <span class="n">filedup</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">f</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">vastart</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>映射之前，需要注意文件权限的问题，如果尝试将一个只读打开的文件映射为可写，并且开启了回盘（MAP_SHARED），则 mmap 应该失败。否则回盘的时候会出现回盘到一个只读文件的错误情况。</p><p>由于需要对映射的页实行懒加载，仅在访问到的时候才从磁盘中加载出来，这里采用和 lab5: Lazy Page Allocation 类似的方式实现。具体请参考 lab5 笔记。</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+</pre><td class="rouge-code"><pre><span class="c1">// kernel/trap.c</span>
+<span class="kt">void</span>
+<span class="nf">usertrap</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">which_dev</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+  <span class="c1">// ......</span>
+
+  <span class="p">}</span> <span class="k">else</span> <span class="nf">if</span><span class="p">((</span><span class="n">which_dev</span> <span class="o">=</span> <span class="n">devintr</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">){</span>
+    <span class="c1">// ok</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">uint64</span> <span class="n">va</span> <span class="o">=</span> <span class="n">r_stval</span><span class="p">();</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">13</span> <span class="o">||</span> <span class="n">r_scause</span><span class="p">()</span> <span class="o">==</span> <span class="mi">15</span><span class="p">)){</span> <span class="c1">// vma lazy allocation</span>
+      <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">vmatrylazytouch</span><span class="p">(</span><span class="n">va</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">goto</span> <span class="n">unexpected_scause</span><span class="p">;</span>
+      <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nl">unexpected_scause:</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">"usertrap(): unexpected scause %p pid=%d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">r_scause</span><span class="p">(),</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span><span class="p">);</span>
+      <span class="n">printf</span><span class="p">(</span><span class="s">"            sepc=%p stval=%p</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">r_sepc</span><span class="p">(),</span> <span class="n">r_stval</span><span class="p">());</span>
+      <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="c1">// ......</span>
+
+  <span class="n">usertrapret</span><span class="p">();</span>
+<span class="err">}</span>
+</pre></table></code></div></div><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+</pre><td class="rouge-code"><pre><span class="c1">// kernel/sysfile.c</span>
+
+<span class="c1">// find a vma using a virtual address inside that vma.</span>
+<span class="k">struct</span> <span class="n">vma</span> <span class="o">*</span><span class="nf">findvma</span><span class="p">(</span><span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">va</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">NVMA</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">vma</span> <span class="o">*</span><span class="n">vv</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">vmas</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">vv</span><span class="o">-&gt;</span><span class="n">valid</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">&amp;&amp;</span> <span class="n">va</span> <span class="o">&gt;=</span> <span class="n">vv</span><span class="o">-&gt;</span><span class="n">vastart</span> <span class="o">&amp;&amp;</span> <span class="n">va</span> <span class="o">&lt;</span> <span class="n">vv</span><span class="o">-&gt;</span><span class="n">vastart</span> <span class="o">+</span> <span class="n">vv</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="n">vv</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// finds out whether a page is previously lazy-allocated for a vma</span>
+<span class="c1">// and needed to be touched before use.</span>
+<span class="c1">// if so, touch it so it's mapped to an actual physical page and contains</span>
+<span class="c1">// content of the mapped file.</span>
+<span class="kt">int</span> <span class="nf">vmatrylazytouch</span><span class="p">(</span><span class="n">uint64</span> <span class="n">va</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
+  <span class="k">struct</span> <span class="n">vma</span> <span class="o">*</span><span class="n">v</span> <span class="o">=</span> <span class="n">findvma</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">va</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// printf("vma mapping: %p =&gt; %d\n", va, v-&gt;offset + PGROUNDDOWN(va - v-&gt;vastart));</span>
+
+  <span class="c1">// allocate physical page</span>
+  <span class="kt">void</span> <span class="o">*</span><span class="n">pa</span> <span class="o">=</span> <span class="n">kalloc</span><span class="p">();</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">pa</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">panic</span><span class="p">(</span><span class="s">"vmalazytouch: kalloc"</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">memset</span><span class="p">(</span><span class="n">pa</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
+  
+  <span class="c1">// read data from disk</span>
+  <span class="n">begin_op</span><span class="p">();</span>
+  <span class="n">ilock</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">ip</span><span class="p">);</span>
+  <span class="n">readi</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">ip</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="p">,</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">offset</span> <span class="o">+</span> <span class="n">PGROUNDDOWN</span><span class="p">(</span><span class="n">va</span> <span class="o">-</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">vastart</span><span class="p">),</span> <span class="n">PGSIZE</span><span class="p">);</span>
+  <span class="n">iunlock</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">ip</span><span class="p">);</span>
+  <span class="n">end_op</span><span class="p">();</span>
+
+  <span class="c1">// set appropriate perms, then map it.</span>
+  <span class="kt">int</span> <span class="n">perm</span> <span class="o">=</span> <span class="n">PTE_U</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">prot</span> <span class="o">&amp;</span> <span class="n">PROT_READ</span><span class="p">)</span>
+    <span class="n">perm</span> <span class="o">|=</span> <span class="n">PTE_R</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">prot</span> <span class="o">&amp;</span> <span class="n">PROT_WRITE</span><span class="p">)</span>
+    <span class="n">perm</span> <span class="o">|=</span> <span class="n">PTE_W</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">prot</span> <span class="o">&amp;</span> <span class="n">PROT_EXEC</span><span class="p">)</span>
+    <span class="n">perm</span> <span class="o">|=</span> <span class="n">PTE_X</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">mappages</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">pa</span><span class="p">,</span> <span class="n">PTE_R</span> <span class="o">|</span> <span class="n">PTE_W</span> <span class="o">|</span> <span class="n">PTE_U</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">panic</span><span class="p">(</span><span class="s">"vmalazytouch: mappages"</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>到这里应该可以通过 mmap 测试了，接下来实现 munmap 调用，将一个 vma 所分配的所有页释放，并在必要的情况下，将已经修改的页写回磁盘。</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+</pre><td class="rouge-code"><pre><span class="c1">// kernel/sysfile.c</span>
+
+<span class="n">uint64</span>
+<span class="nf">sys_munmap</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">uint64</span> <span class="n">addr</span><span class="p">,</span> <span class="n">sz</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">argaddr</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">addr</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">argaddr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">sz</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">sz</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+
+  <span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span> <span class="o">=</span> <span class="n">myproc</span><span class="p">();</span>
+
+  <span class="k">struct</span> <span class="n">vma</span> <span class="o">*</span><span class="n">v</span> <span class="o">=</span> <span class="n">findvma</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">addr</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">v</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">addr</span> <span class="o">&gt;</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">vastart</span> <span class="o">&amp;&amp;</span> <span class="n">addr</span> <span class="o">+</span> <span class="n">sz</span> <span class="o">&lt;</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">vastart</span> <span class="o">+</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// trying to "dig a hole" inside the memory range.</span>
+    <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="n">uint64</span> <span class="n">addr_aligned</span> <span class="o">=</span> <span class="n">addr</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">addr</span> <span class="o">&gt;</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">vastart</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">addr_aligned</span> <span class="o">=</span> <span class="n">PGROUNDUP</span><span class="p">(</span><span class="n">addr</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="kt">int</span> <span class="n">nunmap</span> <span class="o">=</span> <span class="n">sz</span> <span class="o">-</span> <span class="p">(</span><span class="n">addr_aligned</span><span class="o">-</span><span class="n">addr</span><span class="p">);</span> <span class="c1">// nbytes to unmap</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">nunmap</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">nunmap</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  
+  <span class="n">vmaunmap</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">addr_aligned</span><span class="p">,</span> <span class="n">nunmap</span><span class="p">,</span> <span class="n">v</span><span class="p">);</span> <span class="c1">// custom memory page unmap routine for mmapped pages.</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">addr</span> <span class="o">&lt;=</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">vastart</span> <span class="o">&amp;&amp;</span> <span class="n">addr</span> <span class="o">+</span> <span class="n">sz</span> <span class="o">&gt;</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">vastart</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// unmap at the beginning</span>
+    <span class="n">v</span><span class="o">-&gt;</span><span class="n">offset</span> <span class="o">+=</span> <span class="n">addr</span> <span class="o">+</span> <span class="n">sz</span> <span class="o">-</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">vastart</span><span class="p">;</span>
+    <span class="n">v</span><span class="o">-&gt;</span><span class="n">vastart</span> <span class="o">=</span> <span class="n">addr</span> <span class="o">+</span> <span class="n">sz</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">v</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">-=</span> <span class="n">sz</span><span class="p">;</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">fileclose</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">f</span><span class="p">);</span>
+    <span class="n">v</span><span class="o">-&gt;</span><span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>  
+<span class="p">}</span>
+</pre></table></code></div></div><p>这里首先通过传入的地址找到对应的 vma 结构体（通过前面定义的 findvma 方法），然后检测了一下在 vma 区域中间“挖洞”释放的错误情况，计算出应该开始释放的内存地址以及应该释放的内存字节数量（由于页有可能不是完整释放，如果 addr 处于一个页的中间，则那个页的后半部分释放，但是前半部分不释放，此时该页整体不应该被释放）。</p><p>计算出来释放内存页的开始地址以及释放的个数后，调用自定义的 vmaunmap 方法（vm.c）对物理内存页进行释放，并在需要的时候将数据写回磁盘。将该方法独立出来并写到 vm.c 中的理由是方便调用 vm.c 中的 walk 方法。</p><p>在调用 vmaunmap 释放内存页之后，对 v-&gt;offset、v-&gt;vastart 以及 v-&gt;sz 作相应的修改，并在所有页释放完毕之后，关闭对文件的引用，并完全释放该 vma。</p><p>vmaunmap()：</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+</pre><td class="rouge-code"><pre><span class="c1">// kernel/vm.c</span>
+<span class="cp">#include</span> <span class="cpf">"fcntl.h"</span><span class="cp">
+#include</span> <span class="cpf">"spinlock.h"</span><span class="cp">
+#include</span> <span class="cpf">"sleeplock.h"</span><span class="cp">
+#include</span> <span class="cpf">"file.h"</span><span class="cp">
+#include</span> <span class="cpf">"proc.h"</span><span class="cp">
+</span>
+<span class="c1">// Remove n BYTES (not pages) of vma mappings starting from va. va must be</span>
+<span class="c1">// page-aligned. The mappings NEED NOT exist.</span>
+<span class="c1">// Also free the physical memory and write back vma data to disk if necessary.</span>
+<span class="kt">void</span>
+<span class="nf">vmaunmap</span><span class="p">(</span><span class="n">pagetable_t</span> <span class="n">pagetable</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">va</span><span class="p">,</span> <span class="n">uint64</span> <span class="n">nbytes</span><span class="p">,</span> <span class="k">struct</span> <span class="n">vma</span> <span class="o">*</span><span class="n">v</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">uint64</span> <span class="n">a</span><span class="p">;</span>
+  <span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
+
+  <span class="c1">// printf("unmapping %d bytes from %p\n",nbytes, va);</span>
+
+  <span class="c1">// borrowed from "uvmunmap"</span>
+  <span class="k">for</span><span class="p">(</span><span class="n">a</span> <span class="o">=</span> <span class="n">va</span><span class="p">;</span> <span class="n">a</span> <span class="o">&lt;</span> <span class="n">va</span> <span class="o">+</span> <span class="n">nbytes</span><span class="p">;</span> <span class="n">a</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">){</span>
+    <span class="k">if</span><span class="p">((</span><span class="n">pte</span> <span class="o">=</span> <span class="n">walk</span><span class="p">(</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="n">panic</span><span class="p">(</span><span class="s">"sys_munmap: walk"</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">PTE_FLAGS</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">)</span> <span class="o">==</span> <span class="n">PTE_V</span><span class="p">)</span>
+      <span class="n">panic</span><span class="p">(</span><span class="s">"sys_munmap: not a leaf"</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_V</span><span class="p">){</span>
+      <span class="n">uint64</span> <span class="n">pa</span> <span class="o">=</span> <span class="n">PTE2PA</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span><span class="p">);</span>
+      <span class="k">if</span><span class="p">((</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_D</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">MAP_SHARED</span><span class="p">))</span> <span class="p">{</span> <span class="c1">// dirty, need to write back to disk</span>
+        <span class="n">begin_op</span><span class="p">();</span>
+        <span class="n">ilock</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">ip</span><span class="p">);</span>
+        <span class="n">uint64</span> <span class="n">aoff</span> <span class="o">=</span> <span class="n">a</span> <span class="o">-</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">vastart</span><span class="p">;</span> <span class="c1">// offset relative to the start of memory range</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">aoff</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// if the first page is not a full 4k page</span>
+          <span class="n">writei</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">ip</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pa</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="n">aoff</span><span class="p">),</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">offset</span><span class="p">,</span> <span class="n">PGSIZE</span> <span class="o">+</span> <span class="n">aoff</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">aoff</span> <span class="o">+</span> <span class="n">PGSIZE</span> <span class="o">&gt;</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">){</span>  <span class="c1">// if the last page is not a full 4k page</span>
+          <span class="n">writei</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">ip</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pa</span><span class="p">,</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">offset</span> <span class="o">+</span> <span class="n">aoff</span><span class="p">,</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">-</span> <span class="n">aoff</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// full 4k pages</span>
+          <span class="n">writei</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">ip</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pa</span><span class="p">,</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">offset</span> <span class="o">+</span> <span class="n">aoff</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">iunlock</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">ip</span><span class="p">);</span>
+        <span class="n">end_op</span><span class="p">();</span>
+      <span class="p">}</span>
+      <span class="n">kfree</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">pa</span><span class="p">);</span>
+      <span class="o">*</span><span class="n">pte</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>这里的实现大致上和 uvmunmap 相似，查找范围内的每一个页，检测其 dirty bit (D) 是否被设置，如果被设置，则代表该页被修改过，需要将其写回磁盘。注意不是每一个页都需要完整的写回，这里需要处理开头页不完整、结尾页不完整以及中间完整页的情况。</p><p>xv6中本身不带有 dirty bit 的宏定义，在 riscv.h 中手动补齐：</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre><td class="rouge-code"><pre><span class="c1">// kernel/riscv.h</span>
+
+<span class="cp">#define PTE_V (1L &lt;&lt; 0) // valid
+#define PTE_R (1L &lt;&lt; 1)
+#define PTE_W (1L &lt;&lt; 2)
+#define PTE_X (1L &lt;&lt; 3)
+#define PTE_U (1L &lt;&lt; 4) // 1 -&gt; user can access
+#define PTE_G (1L &lt;&lt; 5) // global mapping
+#define PTE_A (1L &lt;&lt; 6) // accessed
+#define PTE_D (1L &lt;&lt; 7) // dirty
+</span></pre></table></code></div></div><p>最后需要做的，是在 proc.c 中添加处理进程 vma 的各部分代码。</p><ul><li>让 allocproc 初始化进程的时候，将 vma 槽都清空<li>freeproc 释放进程时，调用 vmaunmap 将所有 vma 的内存都释放，并在需要的时候写回磁盘<li>fork 时，拷贝父进程的所有 vma，但是不拷贝物理页</ul><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+</pre><td class="rouge-code"><pre><span class="c1">// kernel/proc.c</span>
+
+<span class="k">static</span> <span class="k">struct</span> <span class="n">proc</span><span class="o">*</span>
+<span class="nf">allocproc</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="c1">// ......</span>
+
+  <span class="c1">// Clear VMAs</span>
+  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">NVMA</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">p</span><span class="o">-&gt;</span><span class="n">vmas</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">valid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="n">p</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// free a proc structure and the data hanging from it,</span>
+<span class="c1">// including user pages.</span>
+<span class="c1">// p-&gt;lock must be held.</span>
+<span class="k">static</span> <span class="kt">void</span>
+<span class="nf">freeproc</span><span class="p">(</span><span class="k">struct</span> <span class="n">proc</span> <span class="o">*</span><span class="n">p</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="p">)</span>
+    <span class="n">kfree</span><span class="p">((</span><span class="kt">void</span><span class="o">*</span><span class="p">)</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span><span class="p">);</span>
+  <span class="n">p</span><span class="o">-&gt;</span><span class="n">trapframe</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NVMA</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">vma</span> <span class="o">*</span><span class="n">v</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">vmas</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="n">vmaunmap</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">vastart</span><span class="p">,</span> <span class="n">v</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">,</span> <span class="n">v</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">)</span>
+    <span class="n">proc_freepagetable</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span><span class="p">);</span>
+  <span class="n">p</span><span class="o">-&gt;</span><span class="n">pagetable</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">p</span><span class="o">-&gt;</span><span class="n">sz</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">p</span><span class="o">-&gt;</span><span class="n">pid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">p</span><span class="o">-&gt;</span><span class="n">parent</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">p</span><span class="o">-&gt;</span><span class="n">chan</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">p</span><span class="o">-&gt;</span><span class="n">killed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">p</span><span class="o">-&gt;</span><span class="n">xstate</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">p</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">UNUSED</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Create a new process, copying the parent.</span>
+<span class="c1">// Sets up child kernel stack to return as if from fork() system call.</span>
+<span class="kt">int</span>
+<span class="nf">fork</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="c1">// ......</span>
+
+  <span class="c1">// copy vmas created by mmap.</span>
+  <span class="c1">// actual memory page as well as pte will not be copied over.</span>
+  <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NVMA</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">struct</span> <span class="n">vma</span> <span class="o">*</span><span class="n">v</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">vmas</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">valid</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">np</span><span class="o">-&gt;</span><span class="n">vmas</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">*</span><span class="n">v</span><span class="p">;</span>
+      <span class="n">filedup</span><span class="p">(</span><span class="n">v</span><span class="o">-&gt;</span><span class="n">f</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="n">safestrcpy</span><span class="p">(</span><span class="n">np</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span> <span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">p</span><span class="o">-&gt;</span><span class="n">name</span><span class="p">));</span>
+
+  <span class="n">pid</span> <span class="o">=</span> <span class="n">np</span><span class="o">-&gt;</span><span class="n">pid</span><span class="p">;</span>
+
+  <span class="n">np</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">RUNNABLE</span><span class="p">;</span>
+
+  <span class="n">release</span><span class="p">(</span><span class="o">&amp;</span><span class="n">np</span><span class="o">-&gt;</span><span class="n">lock</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">pid</span><span class="p">;</span>
+<span class="p">}</span>
+
+</pre></table></code></div></div><p>由于 mmap 映射的页并不在 [0, p-&gt;sz) 范围内，所以其页表项在 fork 的时候并不会被拷贝。我们只拷贝了 vma 项到子进程，这样子进程尝试访问 mmap 页的时候，会重新触发懒加载，重新分配物理页以及建立映射。</p><h2 id="执行结果"><span class="mr-2">执行结果</span><a href="#执行结果" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><div class="language-plaintext highlighter-rouge"><div class="code-header"> <span data-label-text="Plaintext"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre><td class="rouge-code"><pre>$ mmaptest
+mmap_test starting
+test mmap f
+test mmap f: OK
+test mmap private
+test mmap private: OK
+test mmap read-only
+test mmap read-only: OK
+test mmap read/write
+test mmap read/write: OK
+test mmap dirty
+test mmap dirty: OK
+test not-mapped unmap
+test not-mapped unmap: OK
+test mmap two files
+test mmap two files: OK
+mmap_test: ALL OK
+fork_test starting
+fork_test OK
+mmaptest: all tests succeeded
+</pre></table></code></div></div></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/course-notes/'>Course Notes</a>, <a href='/categories/mit6-s081/'>MIT6.S081</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/operating-system/" class="post-tag no-text-decoration" >operating system</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> This post is licensed under <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> by the author.</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">Share</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=%5Bmit6.s081%5D+%E7%AC%94%E8%AE%B0+Lab10%3A+Mmap+%7C+%E6%96%87%E4%BB%B6%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84+-+Miigon%27s+blog&url=https%3A%2F%2Fblog.miigon.net%2Fposts%2Fs081-lab10-mmap%2F" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=%5Bmit6.s081%5D+%E7%AC%94%E8%AE%B0+Lab10%3A+Mmap+%7C+%E6%96%87%E4%BB%B6%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84+-+Miigon%27s+blog&u=https%3A%2F%2Fblog.miigon.net%2Fposts%2Fs081-lab10-mmap%2F" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://t.me/share/url?url=https%3A%2F%2Fblog.miigon.net%2Fposts%2Fs081-lab10-mmap%2F&text=%5Bmit6.s081%5D+%E7%AC%94%E8%AE%B0+Lab10%3A+Mmap+%7C+%E6%96%87%E4%BB%B6%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84+-+Miigon%27s+blog" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i id="copy-link" class="fa-fw fas fa-link small" data-toggle="tooltip" data-placement="top" title="Copy link" data-title-succeed="Link copied successfully!"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted"><div class="access"><div id="access-lastmod" class="post"><div class="panel-heading">Recently Updated</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/storing-hash-objects-on-filesystem/">[随笔]文件系统上存储哈希对象：哈希算法以及目录结构对性能的影响</a><li><a href="/posts/origin-of-git-feat-bitkeeper/">git的前世，和BitKeeper</a><li><a href="/posts/golang-loop-var-reference-problems-and-semantic-fix/">随笔：Golang 循环变量引用问题以及官方语义修复</a><li><a href="/posts/s081-lab6-copy-on-write-fork/">[mit6.s081] 笔记 Lab6: Copy-on-write fork | fork 懒拷贝</a><li><a href="/posts/mysql-prepare-slower-query-bug-analyze/">MySQL Prepare后语句查询性能降低 内核源码bug排查分析</a></ul></div><div id="access-tags"><div class="panel-heading">Trending Tags</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/operating-system/">operating system</a> <a class="post-tag" href="/tags/chinese/">Chinese</a> <a class="post-tag" href="/tags/system-design/">system design</a> <a class="post-tag" href="/tags/c/">C++</a> <a class="post-tag" href="/tags/course-recommendation/">course recommendation</a> <a class="post-tag" href="/tags/grpc/">gRPC</a> <a class="post-tag" href="/tags/translated/">translated</a> <a class="post-tag" href="/tags/announcement/">announcement</a> <a class="post-tag" href="/tags/c-standard/">c++ standard</a> <a class="post-tag" href="/tags/computer-system/">computer system</a></div></div><div id="access-links" class="post"><div class="panel-heading">Links</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="http://0xffff.one">0xffff.one 搬砖技术社区</a><li><a href="https://blog.izgq.net">ZGQ's Blog</a></ul></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"><div class="panel-heading pl-3 pt-2 mb-2">Contents</div><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div id="tail-wrapper" class="col-12 col-lg-11 col-xl-9 pl-3 pr-3 pr-xl-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>Further Reading</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/s081-lab1-unix-utilities/"><div class="card-body"> <em class="small" data-ts="1631005200" data-df="ll" > Sep 7, 2021 </em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>[mit6.s081] 笔记 Lab1: Unix utilities | Unix 实用工具</h3><div class="text-muted small"><p> 这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第一篇：Unix utilities。此 lab 大致耗时：4小时。 课程地址：https://pdos.csail.mit.edu/6.S081/2020/schedule.html Lab 地址：https://pdos.csail.mit.edu/6.S081/2020/labs/util.html 我的代码地...</p></div></div></a></div><div class="card"> <a href="/posts/s081-lab2-system-calls/"><div class="card-body"> <em class="small" data-ts="1631185200" data-df="ll" > Sep 9, 2021 </em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>[mit6.s081] 笔记 Lab2: System calls | 系统调用</h3><div class="text-muted small"><p> 这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第二篇：System calls。此 lab 大致耗时：4小时。 课程地址：https://pdos.csail.mit.edu/6.S081/2020/schedule.html Lab 地址：https://pdos.csail.mit.edu/6.S081/2020/labs/syscall.html 我的代码...</p></div></div></a></div><div class="card"> <a href="/posts/s081-lab3-page-tables/"><div class="card-body"> <em class="small" data-ts="1631790000" data-df="ll" > Sep 16, 2021 </em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>[mit6.s081] 笔记 Lab3: Page tables | 页表</h3><div class="text-muted small"><p> 这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第三篇：Page tables。此 lab 大致耗时：19小时。 课程地址：https://pdos.csail.mit.edu/6.S081/2020/schedule.html Lab 地址：https://pdos.csail.mit.edu/6.S081/2020/labs/pgtbl.html 我的代码地址...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/s081-lab9-file-system/" class="btn btn-outline-primary" prompt="Older"><p>[mit6.s081] 笔记 Lab9: File System | 文件系统</p></a> <a href="/posts/s081-lab11-network/" class="btn btn-outline-primary" prompt="Newer"><p>[mit6.s081] 笔记 Lab11: Networking | 网络</p></a></div><script type="text/javascript"> $(function () { const origin = "https://giscus.app"; const iframe = "iframe.giscus-frame"; const lightTheme = "light"; const darkTheme = "dark_dimmed"; let initTheme = lightTheme; if ($("html[data-mode=dark]").length > 0 || ($("html[data-mode]").length == 0 && window.matchMedia("(prefers-color-scheme: dark)").matches)) { initTheme = darkTheme; } let giscusAttributes = { "src": "https://giscus.app/client.js", "data-repo": "Miigon/blog", "data-repo-id": "MDEwOlJlcG9zaXRvcnkzMjI1MjkwNzA=", "data-category": "BlogComments", "data-category-id": "DIC_kwDOEzlnLs4CQ6Y4", "data-mapping": "pathname", "data-reactions-enabled": "1", "data-emit-metadata": "0", "data-theme": initTheme, "data-input-position": "top", "data-lang": "en", "crossorigin": "anonymous", "async": "" }; let giscusScript = document.createElement("script"); Object.entries(giscusAttributes).forEach(([key, value]) => giscusScript.setAttribute(key, value)); document.getElementById("tail-wrapper").prepend(giscusScript); addEventListener("message", (event) => { if (event.source === window && event.data && event.data.direction === ModeToggle.ID) { /* global theme mode changed */ const mode = event.data.message; const theme = (mode === ModeToggle.DARK_MODE ? darkTheme : lightTheme); const message = { setConfig: { theme: theme } }; const giscus = document.querySelector(iframe).contentWindow; giscus.postMessage({ giscus: message }, origin); } }); }); </script></div></div><footer class="row pl-3 pr-3"><div class="col-12 d-flex justify-content-between align-items-center text-muted pl-0 pr-0"><div class="footer-left"><p class="mb-0"> © 2023 <a href="https://github.com/Miigon">Miigon</a>. <span data-toggle="tooltip" data-placement="top" title="Except where otherwise noted, the blog posts on this site are licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) License by the author.">Some rights reserved.</span></p></div><div class="footer-right"><p class="mb-0"> Powered by <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> with <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Customized Chirpy</a> theme.</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><div id="access-tags"><div class="panel-heading">Trending Tags</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/operating-system/">operating system</a> <a class="post-tag" href="/tags/chinese/">Chinese</a> <a class="post-tag" href="/tags/system-design/">system design</a> <a class="post-tag" href="/tags/c/">C++</a> <a class="post-tag" href="/tags/course-recommendation/">course recommendation</a> <a class="post-tag" href="/tags/grpc/">gRPC</a> <a class="post-tag" href="/tags/translated/">translated</a> <a class="post-tag" href="/tags/announcement/">announcement</a> <a class="post-tag" href="/tags/c-standard/">c++ standard</a> <a class="post-tag" href="/tags/computer-system/">computer system</a></div></div></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a><div id="notification" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-animation="true" data-autohide="false"><div class="toast-header"> <button type="button" class="ml-2 ml-auto close" data-dismiss="toast" aria-label="Close"> <span aria-hidden="true">&times;</span> </button></div><div class="toast-body text-center pt-0"><p class="pl-2 pr-2 mb-3">A new version of content is available.</p><button type="button" class="btn btn-primary" aria-label="Update"> Update </button></div></div><script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">Oops! No results found.</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/lozad/dist/lozad.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/dayjs@1/dayjs.min.js,npm/dayjs@1/locale/en.min.js,npm/dayjs@1/plugin/relativeTime.min.js,npm/dayjs@1/plugin/localizedFormat.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.bundle.min.js"></script> <script defer src="/app.js"></script>

@@ -1,0 +1,494 @@
+<!DOCTYPE html><html lang="en" ><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><meta name="generator" content="Jekyll v4.2.2" /><meta property="og:title" content="[mit6.s081] 笔记 Lab7: Multithreading 多线程" /><meta property="og:locale" content="en" /><meta name="description" content="这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第七篇：Multithreading。此 lab 大致耗时：3小时。 课程地址：https://pdos.csail.mit.edu/6.S081/2020/schedule.html Lab 地址：https://pdos.csail.mit.edu/6.S081/2020/labs/thread.html 我的代码地址：https://github.com/Miigon/my-xv6-labs-2020/tree/thread Commits: https://github.com/Miigon/my-xv6-labs-2020/commits/thread 本文中代码注释是编写博客的时候加入的，原仓库中的代码可能缺乏注释或代码不完全相同。" /><meta property="og:description" content="这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第七篇：Multithreading。此 lab 大致耗时：3小时。 课程地址：https://pdos.csail.mit.edu/6.S081/2020/schedule.html Lab 地址：https://pdos.csail.mit.edu/6.S081/2020/labs/thread.html 我的代码地址：https://github.com/Miigon/my-xv6-labs-2020/tree/thread Commits: https://github.com/Miigon/my-xv6-labs-2020/commits/thread 本文中代码注释是编写博客的时候加入的，原仓库中的代码可能缺乏注释或代码不完全相同。" /><link rel="canonical" href="https://blog.miigon.net/posts/s081-lab7-multithreading/" /><meta property="og:url" content="https://blog.miigon.net/posts/s081-lab7-multithreading/" /><meta property="og:site_name" content="Miigon’s blog" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2021-10-07T15:48:00+08:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="[mit6.s081] 笔记 Lab7: Multithreading 多线程" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2021-10-07T15:48:00+08:00","datePublished":"2021-10-07T15:48:00+08:00","description":"这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第七篇：Multithreading。此 lab 大致耗时：3小时。 课程地址：https://pdos.csail.mit.edu/6.S081/2020/schedule.html Lab 地址：https://pdos.csail.mit.edu/6.S081/2020/labs/thread.html 我的代码地址：https://github.com/Miigon/my-xv6-labs-2020/tree/thread Commits: https://github.com/Miigon/my-xv6-labs-2020/commits/thread 本文中代码注释是编写博客的时候加入的，原仓库中的代码可能缺乏注释或代码不完全相同。","headline":"[mit6.s081] 笔记 Lab7: Multithreading 多线程","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.miigon.net/posts/s081-lab7-multithreading/"},"url":"https://blog.miigon.net/posts/s081-lab7-multithreading/"}</script><title>[mit6.s081] 笔记 Lab7: Multithreading | 多线程 | Miigon's blog</title><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/img/favicons/favicon-16x16.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><meta name="apple-mobile-web-app-title" content="Miigon's blog"><meta name="application-name" content="Miigon's blog"><meta name="msapplication-TileColor" content="#da532c"><meta name="msapplication-config" content="/assets/img/favicons/browserconfig.xml"><meta name="theme-color" content="#ffffff"><link rel="preconnect" href="https://fonts.googleapis.com" ><link rel="dns-prefetch" href="https://fonts.googleapis.com" ><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="dns-prefetch" href="https://fonts.gstatic.com" crossorigin><link rel="preconnect" href="https://fonts.googleapis.com" ><link rel="dns-prefetch" href="https://fonts.googleapis.com" ><link rel="preconnect" href="https://cdn.jsdelivr.net" ><link rel="dns-prefetch" href="https://cdn.jsdelivr.net" ><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato&family=Source+Sans+Pro:wght@400;600;700;900&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.11.2/css/all.min.css"><link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/magnific-popup@1/dist/magnific-popup.min.css"> <script src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script> <script type="text/javascript"> class ModeToggle { static get MODE_KEY() { return "mode"; } static get MODE_ATTR() { return "data-mode"; } static get DARK_MODE() { return "dark"; } static get LIGHT_MODE() { return "light"; } static get ID() { return "mode-toggle"; } constructor() { if (this.hasMode) { if (this.isDarkMode) { if (!this.isSysDarkPrefer) { this.setDark(); } } else { if (this.isSysDarkPrefer) { this.setLight(); } } } let self = this; /* always follow the system prefers */ this.sysDarkPrefers.addEventListener("change", () => { if (self.hasMode) { if (self.isDarkMode) { if (!self.isSysDarkPrefer) { self.setDark(); } } else { if (self.isSysDarkPrefer) { self.setLight(); } } self.clearMode(); } self.notify(); }); } /* constructor() */ get sysDarkPrefers() { return window.matchMedia("(prefers-color-scheme: dark)"); } get isSysDarkPrefer() { return this.sysDarkPrefers.matches; } get isDarkMode() { return this.mode === ModeToggle.DARK_MODE; } get isLightMode() { return this.mode === ModeToggle.LIGHT_MODE; } get hasMode() { return this.mode != null; } get mode() { return sessionStorage.getItem(ModeToggle.MODE_KEY); } /* get the current mode on screen */ get modeStatus() { if (this.isDarkMode || (!this.hasMode && this.isSysDarkPrefer)) { return ModeToggle.DARK_MODE; } else { return ModeToggle.LIGHT_MODE; } } setDark() { $('html').attr(ModeToggle.MODE_ATTR, ModeToggle.DARK_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.DARK_MODE); } setLight() { $('html').attr(ModeToggle.MODE_ATTR, ModeToggle.LIGHT_MODE); sessionStorage.setItem(ModeToggle.MODE_KEY, ModeToggle.LIGHT_MODE); } clearMode() { $('html').removeAttr(ModeToggle.MODE_ATTR); sessionStorage.removeItem(ModeToggle.MODE_KEY); } /* Notify another plugins that the theme mode has changed */ notify() { window.postMessage({ direction: ModeToggle.ID, message: this.modeStatus }, "*"); } } /* ModeToggle */ const toggle = new ModeToggle(); function flipMode() { if (toggle.hasMode) { if (toggle.isSysDarkPrefer) { if (toggle.isLightMode) { toggle.clearMode(); } else { toggle.setLight(); } } else { if (toggle.isDarkMode) { toggle.clearMode(); } else { toggle.setDark(); } } } else { if (toggle.isSysDarkPrefer) { toggle.setLight(); } else { toggle.setDark(); } } toggle.notify(); } /* flipMode() */ </script><body data-spy="scroll" data-target="#toc" data-topbar-visible="true"><div id="sidebar" class="d-flex flex-column align-items-end"><div class="profile-wrapper text-center"><div id="avatar"> <a href="/" class="mx-auto"> <img src="/assets/img/avatar.png" alt="avatar" onerror="this.style.display='none'"> </a></div><div class="site-title mt-3"> <a href="/">Miigon's blog</a></div><div class="site-subtitle font-italic">My ideas, thoughts and experiences</div></div><ul class="w-100"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home ml-xl-3 mr-xl-3 unloaded"></i> <span>HOME</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream ml-xl-3 mr-xl-3 unloaded"></i> <span>CATEGORIES</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tag ml-xl-3 mr-xl-3 unloaded"></i> <span>TAGS</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive ml-xl-3 mr-xl-3 unloaded"></i> <span>ARCHIVES</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle ml-xl-3 mr-xl-3 unloaded"></i> <span>ABOUT</span> </a></ul><div class="sidebar-bottom mt-auto d-flex flex-wrap justify-content-center align-items-center"> <button class="mode-toggle btn" aria-label="Switch Mode"> <i class="fas fa-adjust"></i> </button> <span class="icon-border"></span> <a href="https://github.com/Miigon" aria-label="github" target="_blank" rel="noopener"> <i class="fab fa-github-alt"></i> </a> <a href="https://twitter.com/" aria-label="twitter" target="_blank" rel="noopener"> <i class="fab fa-twitter"></i> </a> <a href=" javascript:location.href = 'mailto:' + ['miigon.pg','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="https://stackoverflow.com/users/7509248/miigon" aria-label="stack-overflow" target="_blank" rel="noopener"> <i class="fab fa-stack-overflow"></i> </a></div></div><div id="topbar-wrapper"><div id="topbar" class="container d-flex align-items-center justify-content-between h-100 pl-3 pr-3 pl-md-4 pr-md-4"> <span id="breadcrumb"> <span> <a href="/"> Home </a> </span> <span>[mit6.s081] 笔记 Lab7: Multithreading | 多线程</span> </span> <i id="sidebar-trigger" class="fas fa-bars fa-fw"></i><div id="topbar-title"> Post</div><i id="search-trigger" class="fas fa-search fa-fw"></i> <span id="search-wrapper" class="align-items-center"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="Search..."> </span> <span id="search-cancel" >Cancel</span></div></div><div id="main-wrapper" class="d-flex justify-content-center"><div id="main" class="container pl-xl-4 pr-xl-4"><div class="row"><div id="core-wrapper" class="col-12 col-lg-11 col-xl-9 pr-xl-4"><div class="post pl-1 pr-1 pl-md-2 pr-md-2"><h1 data-toc-skip>[mit6.s081] 笔记 Lab7: Multithreading | 多线程</h1><div class="post-meta text-muted"> <span> Posted <em class="" data-ts="1633592880" data-df="ll" data-toggle="tooltip" data-placement="bottom"> Oct 7, 2021 </em> </span><div class="d-flex justify-content-between"> <span> By <em> <a href="https://github.com/Miigon">Miigon</a> </em> </span><div> <span class="readtime" data-toggle="tooltip" data-placement="bottom" title="3058 words"> <em>16 min</em> read</span></div></div></div><div class="post-content"><blockquote><p>这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第七篇：Multithreading。此 lab 大致耗时：3小时。</p><p>课程地址：<a href="https://pdos.csail.mit.edu/6.S081/2020/schedule.html">https://pdos.csail.mit.edu/6.S081/2020/schedule.html</a><br /> Lab 地址：<a href="https://pdos.csail.mit.edu/6.S081/2020/labs/thread.html">https://pdos.csail.mit.edu/6.S081/2020/labs/thread.html</a><br /> 我的代码地址：<a href="https://github.com/Miigon/my-xv6-labs-2020/tree/thread">https://github.com/Miigon/my-xv6-labs-2020/tree/thread</a><br /> Commits: <a href="https://github.com/Miigon/my-xv6-labs-2020/commits/thread">https://github.com/Miigon/my-xv6-labs-2020/commits/thread</a></p><p>本文中代码注释是编写博客的时候加入的，原仓库中的代码可能缺乏注释或代码不完全相同。</p></blockquote><h1 id="lab-7-multithreading">Lab 7: Multithreading</h1><p>This lab will familiarize you with multithreading. You will implement switching between threads in a user-level threads package, use multiple threads to speed up a program, and implement a barrier.</p><p>实现一个用户态的线程库；尝试使用线程来为程序提速；并且尝试实现一个同步屏障</p><h2 id="uthread-switching-between-threads-moderate"><span class="mr-2">Uthread: switching between threads (moderate)</span><a href="#uthread-switching-between-threads-moderate" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>补全 uthread.c，完成用户态线程功能的实现。</p><p>这里的线程相比现代操作系统中的线程而言，更接近一些语言中的“协程”（coroutine）。原因是这里的“线程”是完全用户态实现的，多个线程也只能运行在一个 CPU 上，并且没有时钟中断来强制执行调度，需要线程函数本身在合适的时候主动 yield 释放 CPU。这样实现起来的线程并不对线程函数透明，所以比起操作系统的线程而言更接近 coroutine。</p><p>这个实验其实相当于在用户态重新实现一遍 xv6 kernel 中的 scheduler() 和 swtch() 的功能，所以大多数代码都是可以借鉴的。</p><p>uthread_switch.S 中需要实现上下文切换的代码，这里借鉴 swtch.S：</p><pre><code class="language-asm">// uthread_switch.S
+	.text
+
+	/*
+		 * save the old thread's registers,
+		 * restore the new thread's registers.
+		 */
+
+
+// void thread_switch(struct context *old, struct context *new);
+	.globl thread_switch
+thread_switch:
+	sd ra, 0(a0)
+	sd sp, 8(a0)
+	sd s0, 16(a0)
+	sd s1, 24(a0)
+	sd s2, 32(a0)
+	sd s3, 40(a0)
+	sd s4, 48(a0)
+	sd s5, 56(a0)
+	sd s6, 64(a0)
+	sd s7, 72(a0)
+	sd s8, 80(a0)
+	sd s9, 88(a0)
+	sd s10, 96(a0)
+	sd s11, 104(a0)
+
+	ld ra, 0(a1)
+	ld sp, 8(a1)
+	ld s0, 16(a1)
+	ld s1, 24(a1)
+	ld s2, 32(a1)
+	ld s3, 40(a1)
+	ld s4, 48(a1)
+	ld s5, 56(a1)
+	ld s6, 64(a1)
+	ld s7, 72(a1)
+	ld s8, 80(a1)
+	ld s9, 88(a1)
+	ld s10, 96(a1)
+	ld s11, 104(a1)
+
+	ret    /* return to ra */
+</code></pre><p>在调用本函数 uthread_switch() 的过程中，caller-saved registers 已经被调用者保存到栈帧中了，所以这里无需保存这一部分寄存器。</p><blockquote><p>引申：内核调度器无论是通过时钟中断进入（usertrap），还是线程自己主动放弃 CPU（sleep、exit），最终都会调用到 yield 进一步调用 swtch。 由于上下文切换永远都发生在函数调用的边界（swtch 调用的边界），恢复执行相当于是 swtch 的返回过程，会从堆栈中恢复 caller-saved 的寄存器， 所以用于保存上下文的 context 结构体只需保存 callee-saved 寄存器，以及 返回地址 ra、栈指针 sp 即可。恢复后执行到哪里是通过 ra 寄存器来决定的（swtch 末尾的 ret 转跳到 ra）</p><p>而 trapframe 则不同，一个中断可能在任何地方发生，不仅仅是函数调用边界，也有可能在函数执行中途，所以恢复的时候需要靠 pc 寄存器来定位。 并且由于切换位置不一定是函数调用边界，所以几乎所有的寄存器都要保存（无论 caller-saved 还是 callee-saved），才能保证正确的恢复执行。 这也是内核代码中 <code class="language-plaintext highlighter-rouge">struct trapframe</code> 中保存的寄存器比 <code class="language-plaintext highlighter-rouge">struct context</code> 多得多的原因。</p><p>另外一个，无论是程序主动 sleep，还是时钟中断，都是通过 trampoline 跳转到内核态 usertrap（保存 trapframe），然后再到达 swtch 保存上下文的。 恢复上下文都是恢复到 swtch 返回前（依然是内核态），然后返回跳转回 usertrap，再继续运行直到 usertrapret 跳转到 trampoline 读取 trapframe，并返回用户态。 也就是上下文恢复并不是直接恢复到用户态，而是恢复到内核态 swtch 刚执行完的状态。负责恢复用户态执行流的其实是 trampoline 以及 trapframe。</p></blockquote><p>从 proc.h 中借鉴一下 context 结构体，用于保存 ra、sp 以及 callee-saved registers：</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+</pre><td class="rouge-code"><pre><span class="c1">// uthread.c</span>
+<span class="c1">// Saved registers for thread context switches.</span>
+<span class="k">struct</span> <span class="n">context</span> <span class="p">{</span>
+  <span class="n">uint64</span> <span class="n">ra</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">sp</span><span class="p">;</span>
+
+  <span class="c1">// callee-saved</span>
+  <span class="n">uint64</span> <span class="n">s0</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">s1</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">s2</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">s3</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">s4</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">s5</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">s6</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">s7</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">s8</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">s9</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">s10</span><span class="p">;</span>
+  <span class="n">uint64</span> <span class="n">s11</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">struct</span> <span class="kr">thread</span> <span class="p">{</span>
+  <span class="kt">char</span>       <span class="n">stack</span><span class="p">[</span><span class="n">STACK_SIZE</span><span class="p">];</span> <span class="cm">/* the thread's stack */</span>
+  <span class="kt">int</span>        <span class="n">state</span><span class="p">;</span>             <span class="cm">/* FREE, RUNNING, RUNNABLE */</span>
+  <span class="k">struct</span> <span class="n">context</span> <span class="n">ctx</span><span class="p">;</span> <span class="c1">// 在 thread 中添加 context 结构体</span>
+<span class="p">};</span>
+<span class="k">struct</span> <span class="kr">thread</span> <span class="n">all_thread</span><span class="p">[</span><span class="n">MAX_THREAD</span><span class="p">];</span>
+<span class="k">struct</span> <span class="kr">thread</span> <span class="o">*</span><span class="n">current_thread</span><span class="p">;</span>
+
+<span class="k">extern</span> <span class="kt">void</span> <span class="nf">thread_switch</span><span class="p">(</span><span class="k">struct</span> <span class="n">context</span><span class="o">*</span> <span class="n">old</span><span class="p">,</span> <span class="k">struct</span> <span class="n">context</span><span class="o">*</span> <span class="n">new</span><span class="p">);</span> <span class="c1">// 修改 thread_switch 函数声明</span>
+</pre></table></code></div></div><p>在 thread_schedule 中调用 thread_switch 进行上下文切换：</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre><td class="rouge-code"><pre><span class="c1">// uthread.c</span>
+<span class="kt">void</span> 
+<span class="nf">thread_schedule</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="c1">// ......</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">current_thread</span> <span class="o">!=</span> <span class="n">next_thread</span><span class="p">)</span> <span class="p">{</span>         <span class="cm">/* switch threads?  */</span>
+    <span class="n">next_thread</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">RUNNING</span><span class="p">;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">current_thread</span><span class="p">;</span>
+    <span class="n">current_thread</span> <span class="o">=</span> <span class="n">next_thread</span><span class="p">;</span>
+    <span class="n">thread_switch</span><span class="p">(</span><span class="o">&amp;</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">ctx</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">next_thread</span><span class="o">-&gt;</span><span class="n">ctx</span><span class="p">);</span> <span class="c1">// 切换线程</span>
+  <span class="p">}</span> <span class="k">else</span>
+    <span class="n">next_thread</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+</pre></table></code></div></div><p>这里有个小坑是要从 t 切换到 next_thread，不是从 current_thread 切换到 next_thread（因为前面有两句赋值，没错，我在这里眼瞎了卡了一下 QAQ）</p><p>再补齐 thread_create：</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre><td class="rouge-code"><pre><span class="c1">// uthread.c</span>
+<span class="kt">void</span> 
+<span class="nf">thread_create</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">func</span><span class="p">)())</span>
+<span class="p">{</span>
+  <span class="k">struct</span> <span class="kr">thread</span> <span class="o">*</span><span class="n">t</span><span class="p">;</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="n">t</span> <span class="o">=</span> <span class="n">all_thread</span><span class="p">;</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">all_thread</span> <span class="o">+</span> <span class="n">MAX_THREAD</span><span class="p">;</span> <span class="n">t</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">==</span> <span class="n">FREE</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="n">t</span><span class="o">-&gt;</span><span class="n">state</span> <span class="o">=</span> <span class="n">RUNNABLE</span><span class="p">;</span>
+  <span class="n">t</span><span class="o">-&gt;</span><span class="n">ctx</span><span class="p">.</span><span class="n">ra</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="n">func</span><span class="p">;</span>       <span class="c1">// 返回地址</span>
+  <span class="c1">// thread_switch 的结尾会返回到 ra，从而运行线程代码</span>
+  <span class="n">t</span><span class="o">-&gt;</span><span class="n">ctx</span><span class="p">.</span><span class="n">sp</span> <span class="o">=</span> <span class="p">(</span><span class="n">uint64</span><span class="p">)</span><span class="o">&amp;</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">stack</span> <span class="o">+</span> <span class="p">(</span><span class="n">STACK_SIZE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">);</span>  <span class="c1">// 栈指针</span>
+  <span class="c1">// 将线程的栈指针指向其独立的栈，注意到栈的生长是从高地址到低地址，所以</span>
+  <span class="c1">// 要将 sp 设置为指向 stack 的最高地址</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>添加的部分为设置上下文中 ra 指向的地址为线程函数的地址，这样在第一次调度到该线程，执行到 thread_switch 中的 ret 之后就可以跳转到线程函数从而开始执行了。设置 sp 使得线程拥有自己独有的栈，也就是独立的执行流。</p><div class="language-plaintext highlighter-rouge"><div class="code-header"> <span data-label-text="Plaintext"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+</pre><td class="rouge-code"><pre>$ uthread
+thread_a started
+thread_b started
+thread_c started
+thread_c 0
+thread_a 0
+thread_b 0
+thread_c 1
+thread_a 1
+thread_b 1
+
+......
+
+thread_c 98
+thread_a 98
+thread_b 98
+thread_c 99
+thread_a 99
+thread_b 99
+thread_c: exit after 100
+thread_a: exit after 100
+thread_b: exit after 100
+thread_schedule: no runnable threads
+</pre></table></code></div></div><h3 id="using-threads-moderate"><span class="mr-2">Using threads (moderate)</span><a href="#using-threads-moderate" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>分析并解决一个哈希表操作的例子内，由于 race-condition 导致的数据丢失的问题。</p><blockquote><p>Why are there missing keys with 2 threads, but not with 1 thread? Identify a sequence of events with 2 threads that can lead to a key being missing. Submit your sequence with a short explanation in answers-thread.txt</p></blockquote><div class="language-plaintext highlighter-rouge"><div class="code-header"> <span data-label-text="Plaintext"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre><td class="rouge-code"><pre>[假设键 k1、k2 属于同个 bucket]
+
+thread 1: 尝试设置 k1
+thread 1: 发现 k1 不存在，尝试在 bucket 末尾插入 k1
+--- scheduler 切换到 thread 2
+thread 2: 尝试设置 k2
+thread 2: 发现 k2 不存在，尝试在 bucket 末尾插入 k2
+thread 2: 分配 entry，在桶末尾插入 k2
+--- scheduler 切换回 thread 1
+thread 1: 分配 entry，没有意识到 k2 的存在，在其认为的 “桶末尾”（实际为 k2 所处位置）插入 k1
+
+[k1 被插入，但是由于被 k1 覆盖，k2 从桶中消失了，引发了键值丢失]
+</pre></table></code></div></div><p>首先先暂时忽略速度，为 put 和 get 操作加锁保证安全：</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+</pre><td class="rouge-code"><pre><span class="c1">// ph.c</span>
+<span class="n">pthread_mutex_t</span> <span class="n">lock</span><span class="p">;</span>
+
+<span class="kt">int</span>
+<span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+  <span class="n">pthread_t</span> <span class="o">*</span><span class="n">tha</span><span class="p">;</span>
+  <span class="kt">void</span> <span class="o">*</span><span class="n">value</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t0</span><span class="p">;</span>
+  
+  <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lock</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+
+  <span class="c1">// ......</span>
+<span class="p">}</span>
+
+<span class="k">static</span> 
+<span class="kt">void</span> <span class="nf">put</span><span class="p">(</span><span class="kt">int</span> <span class="n">key</span><span class="p">,</span> <span class="kt">int</span> <span class="n">value</span><span class="p">)</span>
+<span class="p">{</span>
+   <span class="n">NBUCKET</span><span class="p">;</span>
+
+  <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lock</span><span class="p">);</span>
+  
+  <span class="c1">// ......</span>
+
+  <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lock</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="k">struct</span> <span class="n">entry</span><span class="o">*</span>
+<span class="nf">get</span><span class="p">(</span><span class="kt">int</span> <span class="n">key</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="err">$</span> <span class="n">NBUCKET</span><span class="p">;</span>
+
+  <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lock</span><span class="p">);</span>
+  
+  <span class="c1">// ......</span>
+
+  <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">lock</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">e</span><span class="p">;</span>
+<span class="p">}</span>
+
+</pre></table></code></div></div><p>加完这个锁，就可以通过 ph_safe 测试了，编译执行：</p><div class="language-plaintext highlighter-rouge"><div class="code-header"> <span data-label-text="Plaintext"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre><td class="rouge-code"><pre>$ ./ph 1
+100000 puts, 4.652 seconds, 21494 puts/second
+0: 0 keys missing
+100000 gets, 5.098 seconds, 19614 gets/second
+$ ./ph 2
+100000 puts, 5.224 seconds, 19142 puts/second
+0: 0 keys missing
+1: 0 keys missing
+200000 gets, 10.222 seconds, 19566 gets/second
+</pre></table></code></div></div><p>可以发现，多线程执行的版本也不会丢失 key 了，说明加锁成功防止了 race-condition 的出现。</p><p>但是仔细观察会发现，加锁后多线程的性能变得比单线程还要低了，虽然不会出现数据丢失，但是失去了多线程并行计算的意义：提升性能。</p><p>这里的原因是，我们为整个操作加上了互斥锁，意味着每一时刻只能有一个线程在操作哈希表，这里实际上等同于将哈希表的操作变回单线程了，又由于锁操作（加锁、解锁、锁竞争）是有开销的，所以性能甚至不如单线程版本。</p><p>这里的优化思路，也是多线程效率的一个常见的优化思路，就是降低锁的粒度。由于哈希表中，不同的 bucket 是互不影响的，一个 bucket 处于修改未完全的状态并不影响 put 和 get 对其他 bucket 的操作，所以实际上只需要确保两个线程不会同时操作同一个 bucket 即可，并不需要确保不会同时操作整个哈希表。</p><p>所以可以将加锁的粒度，从整个哈希表一个锁降低到每个 bucket 一个锁。</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+</pre><td class="rouge-code"><pre><span class="c1">// ph.c</span>
+<span class="n">pthread_mutex_t</span> <span class="n">locks</span><span class="p">;</span>
+
+<span class="kt">int</span>
+<span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+  <span class="n">pthread_t</span> <span class="o">*</span><span class="n">tha</span><span class="p">;</span>
+  <span class="kt">void</span> <span class="o">*</span><span class="n">value</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t0</span><span class="p">;</span>
+  
+  <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">NBUCKET</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">pthread_mutex_init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">NULL</span><span class="p">);</span> 
+  <span class="p">}</span>
+
+  <span class="c1">// ......</span>
+<span class="p">}</span>
+
+<span class="k">static</span> 
+<span class="kt">void</span> <span class="nf">put</span><span class="p">(</span><span class="kt">int</span> <span class="n">key</span><span class="p">,</span> <span class="kt">int</span> <span class="n">value</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">key</span> <span class="o">%</span> <span class="n">NBUCKET</span><span class="p">;</span>
+
+  <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+  
+  <span class="c1">// ......</span>
+
+  <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="k">struct</span> <span class="n">entry</span><span class="o">*</span>
+<span class="nf">get</span><span class="p">(</span><span class="kt">int</span> <span class="n">key</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">key</span> <span class="o">%</span> <span class="n">NBUCKET</span><span class="p">;</span>
+
+  <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+  
+  <span class="c1">// ......</span>
+
+  <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">locks</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+
+  <span class="k">return</span> <span class="n">e</span><span class="p">;</span>
+<span class="p">}</span>
+
+</pre></table></code></div></div><p>在这样修改后，编译执行：</p><div class="language-plaintext highlighter-rouge"><div class="code-header"> <span data-label-text="Plaintext"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+</pre><td class="rouge-code"><pre>$ ./ph 1
+100000 puts, 4.940 seconds, 20241 puts/second
+0: 0 keys missing
+100000 gets, 4.934 seconds, 20267 gets/second
+$ ./ph 2
+100000 puts, 3.489 seconds, 28658 puts/second
+0: 0 keys missing
+1: 0 keys missing
+200000 gets, 6.104 seconds, 32766 gets/second
+$ ./ph 4
+100000 puts, 1.881 seconds, 53169 puts/second
+0: 0 keys missing
+3: 0 keys missing
+2: 0 keys missing
+1: 0 keys missing
+400000 gets, 7.376 seconds, 54229 gets/second
+</pre></table></code></div></div><p>可以看到，多线程版本的性能有了显著提升（虽然由于锁开销，依然达不到理想的 <code class="language-plaintext highlighter-rouge">单线程速度 * 线程数</code> 那么快），并且依然没有 missing key。</p><p>此时再运行 grade，就可以通过 ph_fast 测试了。</p><h3 id="barrier-moderate"><span class="mr-2">Barrier (moderate)</span><a href="#barrier-moderate" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>利用 pthread 提供的条件变量方法，实现<a href="https://en.wikipedia.org/wiki/Barrier_(computer_science)">同步屏障机制</a>。</p><div class="language-c highlighter-rouge"><div class="code-header"> <span data-label-text="C"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre><td class="rouge-code"><pre><span class="c1">// barrier.c</span>
+<span class="k">static</span> <span class="kt">void</span> 
+<span class="nf">barrier</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">pthread_mutex_lock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_mutex</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="o">++</span><span class="n">bstate</span><span class="p">.</span><span class="n">nthread</span> <span class="o">&lt;</span> <span class="n">nthread</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">pthread_cond_wait</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_cond</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_mutex</span><span class="p">);</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">bstate</span><span class="p">.</span><span class="n">nthread</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="n">bstate</span><span class="p">.</span><span class="n">round</span><span class="o">++</span><span class="p">;</span>
+    <span class="n">pthread_cond_broadcast</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_cond</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">pthread_mutex_unlock</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bstate</span><span class="p">.</span><span class="n">barrier_mutex</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></table></code></div></div><p>线程进入同步屏障 barrier 时，将已进入屏障的线程数量增加 1，然后再判断是否已经达到总线程数。<br /> 如果未达到，则进入睡眠，等待其他线程。<br /> 如果已经达到，则唤醒所有在 barrier 中等待的线程，所有线程继续执行；屏障轮数 + 1；</p><p>「将已进入屏障的线程数量增加 1，然后再判断是否已经达到总线程数」这一步并不是原子操作，并且这一步和后面的两种情况中的操作「睡眠」和「唤醒」之间也不是原子的，如果在这里发生 race-condition，则会导致出现 「lost wake-up 问题」（线程 1 即将睡眠前，线程 2 调用了唤醒，然后线程 1 才进入睡眠，导致线程 1 本该被唤醒而没被唤醒，详见 <a href="https://pdos.csail.mit.edu/6.S081/2020/xv6/book-riscv-rev1.pdf">xv6 book</a> 中的第 72 页，Sleep and wakeup）</p><p>解决方法是，「屏障的线程数量增加 1；判断是否已经达到总线程数；进入睡眠」这三步必须原子。所以使用一个互斥锁 barrier_mutex 来保护这一部分代码。pthread_cond_wait 会在进入睡眠的时候原子性的释放 barrier_mutex，从而允许后续线程进入 barrier，防止死锁。</p><p>执行测试：</p><div class="language-plaintext highlighter-rouge"><div class="code-header"> <span data-label-text="Plaintext"><i class="fas fa-code small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre><td class="rouge-code"><pre>$ ./barrier 1
+OK; passed
+$ ./barrier 2
+OK; passed
+$ ./barrier 4
+OK; passed
+</pre></table></code></div></div></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw mr-1"></i> <a href='/categories/course-notes/'>Course Notes</a>, <a href='/categories/mit6-s081/'>MIT6.S081</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw mr-1"></i> <a href="/tags/operating-system/" class="post-tag no-text-decoration" >operating system</a></div><div class="post-tail-bottom d-flex justify-content-between align-items-center mt-3 pt-5 pb-2"><div class="license-wrapper"> This post is licensed under <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> by the author.</div><div class="share-wrapper"> <span class="share-label text-muted mr-1">Share</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=%5Bmit6.s081%5D+%E7%AC%94%E8%AE%B0+Lab7%3A+Multithreading+%7C+%E5%A4%9A%E7%BA%BF%E7%A8%8B+-+Miigon%27s+blog&url=https%3A%2F%2Fblog.miigon.net%2Fposts%2Fs081-lab7-multithreading%2F" data-toggle="tooltip" data-placement="top" title="Twitter" target="_blank" rel="noopener" aria-label="Twitter"> <i class="fa-fw fab fa-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=%5Bmit6.s081%5D+%E7%AC%94%E8%AE%B0+Lab7%3A+Multithreading+%7C+%E5%A4%9A%E7%BA%BF%E7%A8%8B+-+Miigon%27s+blog&u=https%3A%2F%2Fblog.miigon.net%2Fposts%2Fs081-lab7-multithreading%2F" data-toggle="tooltip" data-placement="top" title="Facebook" target="_blank" rel="noopener" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://t.me/share/url?url=https%3A%2F%2Fblog.miigon.net%2Fposts%2Fs081-lab7-multithreading%2F&text=%5Bmit6.s081%5D+%E7%AC%94%E8%AE%B0+Lab7%3A+Multithreading+%7C+%E5%A4%9A%E7%BA%BF%E7%A8%8B+-+Miigon%27s+blog" data-toggle="tooltip" data-placement="top" title="Telegram" target="_blank" rel="noopener" aria-label="Telegram"> <i class="fa-fw fab fa-telegram"></i> </a> <i id="copy-link" class="fa-fw fas fa-link small" data-toggle="tooltip" data-placement="top" title="Copy link" data-title-succeed="Link copied successfully!"> </i> </span></div></div></div></div></div><div id="panel-wrapper" class="col-xl-3 pl-2 text-muted"><div class="access"><div id="access-lastmod" class="post"><div class="panel-heading">Recently Updated</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="/posts/storing-hash-objects-on-filesystem/">[随笔]文件系统上存储哈希对象：哈希算法以及目录结构对性能的影响</a><li><a href="/posts/origin-of-git-feat-bitkeeper/">git的前世，和BitKeeper</a><li><a href="/posts/golang-loop-var-reference-problems-and-semantic-fix/">随笔：Golang 循环变量引用问题以及官方语义修复</a><li><a href="/posts/s081-lab6-copy-on-write-fork/">[mit6.s081] 笔记 Lab6: Copy-on-write fork | fork 懒拷贝</a><li><a href="/posts/mysql-prepare-slower-query-bug-analyze/">MySQL Prepare后语句查询性能降低 内核源码bug排查分析</a></ul></div><div id="access-tags"><div class="panel-heading">Trending Tags</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/operating-system/">operating system</a> <a class="post-tag" href="/tags/chinese/">Chinese</a> <a class="post-tag" href="/tags/system-design/">system design</a> <a class="post-tag" href="/tags/c/">C++</a> <a class="post-tag" href="/tags/course-recommendation/">course recommendation</a> <a class="post-tag" href="/tags/grpc/">gRPC</a> <a class="post-tag" href="/tags/translated/">translated</a> <a class="post-tag" href="/tags/announcement/">announcement</a> <a class="post-tag" href="/tags/c-standard/">c++ standard</a> <a class="post-tag" href="/tags/computer-system/">computer system</a></div></div><div id="access-links" class="post"><div class="panel-heading">Links</div><ul class="post-content pl-0 pb-1 ml-1 mt-2"><li><a href="http://0xffff.one">0xffff.one 搬砖技术社区</a><li><a href="https://blog.izgq.net">ZGQ's Blog</a></ul></div></div><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@1.0.1/dist/bootstrap-toc.min.js"></script><div id="toc-wrapper" class="pl-0 pr-4 mb-5"><div class="panel-heading pl-3 pt-2 mb-2">Contents</div><nav id="toc" data-toggle="toc"></nav></div></div></div><div class="row"><div id="tail-wrapper" class="col-12 col-lg-11 col-xl-9 pl-3 pr-3 pr-xl-4"><div id="related-posts" class="mt-5 mb-2 mb-sm-4"><h3 class="pt-2 mt-1 mb-4 ml-1" data-toc-skip>Further Reading</h3><div class="card-deck mb-4"><div class="card"> <a href="/posts/s081-lab1-unix-utilities/"><div class="card-body"> <em class="small" data-ts="1631005200" data-df="ll" > Sep 7, 2021 </em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>[mit6.s081] 笔记 Lab1: Unix utilities | Unix 实用工具</h3><div class="text-muted small"><p> 这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第一篇：Unix utilities。此 lab 大致耗时：4小时。 课程地址：https://pdos.csail.mit.edu/6.S081/2020/schedule.html Lab 地址：https://pdos.csail.mit.edu/6.S081/2020/labs/util.html 我的代码地...</p></div></div></a></div><div class="card"> <a href="/posts/s081-lab2-system-calls/"><div class="card-body"> <em class="small" data-ts="1631185200" data-df="ll" > Sep 9, 2021 </em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>[mit6.s081] 笔记 Lab2: System calls | 系统调用</h3><div class="text-muted small"><p> 这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第二篇：System calls。此 lab 大致耗时：4小时。 课程地址：https://pdos.csail.mit.edu/6.S081/2020/schedule.html Lab 地址：https://pdos.csail.mit.edu/6.S081/2020/labs/syscall.html 我的代码...</p></div></div></a></div><div class="card"> <a href="/posts/s081-lab3-page-tables/"><div class="card-body"> <em class="small" data-ts="1631790000" data-df="ll" > Sep 16, 2021 </em><h3 class="pt-0 mt-1 mb-3" data-toc-skip>[mit6.s081] 笔记 Lab3: Page tables | 页表</h3><div class="text-muted small"><p> 这是我自学 MIT6.S081 操作系统课程的 lab 代码笔记第三篇：Page tables。此 lab 大致耗时：19小时。 课程地址：https://pdos.csail.mit.edu/6.S081/2020/schedule.html Lab 地址：https://pdos.csail.mit.edu/6.S081/2020/labs/pgtbl.html 我的代码地址...</p></div></div></a></div></div></div><div class="post-navigation d-flex justify-content-between"> <a href="/posts/s081-lab6-copy-on-write-fork/" class="btn btn-outline-primary" prompt="Older"><p>[mit6.s081] 笔记 Lab6: Copy-on-write fork | fork 懒拷贝</p></a> <a href="/posts/s081-lab8-locks/" class="btn btn-outline-primary" prompt="Newer"><p>[mit6.s081] 笔记 Lab8: Locks | 锁优化</p></a></div><script type="text/javascript"> $(function () { const origin = "https://giscus.app"; const iframe = "iframe.giscus-frame"; const lightTheme = "light"; const darkTheme = "dark_dimmed"; let initTheme = lightTheme; if ($("html[data-mode=dark]").length > 0 || ($("html[data-mode]").length == 0 && window.matchMedia("(prefers-color-scheme: dark)").matches)) { initTheme = darkTheme; } let giscusAttributes = { "src": "https://giscus.app/client.js", "data-repo": "Miigon/blog", "data-repo-id": "MDEwOlJlcG9zaXRvcnkzMjI1MjkwNzA=", "data-category": "BlogComments", "data-category-id": "DIC_kwDOEzlnLs4CQ6Y4", "data-mapping": "pathname", "data-reactions-enabled": "1", "data-emit-metadata": "0", "data-theme": initTheme, "data-input-position": "top", "data-lang": "en", "crossorigin": "anonymous", "async": "" }; let giscusScript = document.createElement("script"); Object.entries(giscusAttributes).forEach(([key, value]) => giscusScript.setAttribute(key, value)); document.getElementById("tail-wrapper").prepend(giscusScript); addEventListener("message", (event) => { if (event.source === window && event.data && event.data.direction === ModeToggle.ID) { /* global theme mode changed */ const mode = event.data.message; const theme = (mode === ModeToggle.DARK_MODE ? darkTheme : lightTheme); const message = { setConfig: { theme: theme } }; const giscus = document.querySelector(iframe).contentWindow; giscus.postMessage({ giscus: message }, origin); } }); }); </script></div></div><footer class="row pl-3 pr-3"><div class="col-12 d-flex justify-content-between align-items-center text-muted pl-0 pr-0"><div class="footer-left"><p class="mb-0"> © 2023 <a href="https://github.com/Miigon">Miigon</a>. <span data-toggle="tooltip" data-placement="top" title="Except where otherwise noted, the blog posts on this site are licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) License by the author.">Some rights reserved.</span></p></div><div class="footer-right"><p class="mb-0"> Powered by <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a> with <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">Customized Chirpy</a> theme.</p></div></div></footer></div><div id="search-result-wrapper" class="d-flex justify-content-center unloaded"><div class="col-12 col-sm-11 post-content"><div id="search-hints"><div id="access-tags"><div class="panel-heading">Trending Tags</div><div class="d-flex flex-wrap mt-3 mb-1 mr-3"> <a class="post-tag" href="/tags/operating-system/">operating system</a> <a class="post-tag" href="/tags/chinese/">Chinese</a> <a class="post-tag" href="/tags/system-design/">system design</a> <a class="post-tag" href="/tags/c/">C++</a> <a class="post-tag" href="/tags/course-recommendation/">course recommendation</a> <a class="post-tag" href="/tags/grpc/">gRPC</a> <a class="post-tag" href="/tags/translated/">translated</a> <a class="post-tag" href="/tags/announcement/">announcement</a> <a class="post-tag" href="/tags/c-standard/">c++ standard</a> <a class="post-tag" href="/tags/computer-system/">computer system</a></div></div></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><div id="mask"></div><a id="back-to-top" href="#" aria-label="back-to-top" class="btn btn-lg btn-box-shadow" role="button"> <i class="fas fa-angle-up"></i> </a><div id="notification" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-animation="true" data-autohide="false"><div class="toast-header"> <button type="button" class="ml-2 ml-auto close" data-dismiss="toast" aria-label="Close"> <span aria-hidden="true">&times;</span> </button></div><div class="toast-body text-center pt-0"><p class="pl-2 pr-2 mb-3">A new version of content is available.</p><button type="button" class="btn btn-primary" aria-label="Update"> Update </button></div></div><script src="https://cdn.jsdelivr.net/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js"></script> <script> SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<div class="pl-1 pr-1 pl-sm-2 pr-sm-2 pl-lg-4 pr-lg-4 pl-xl-0 pr-xl-0"> <a href="{url}">{title}</a><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div><p>{snippet}</p></div>', noResultsText: '<p class="mt-5">Oops! No results found.</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="mr-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); </script> <script src="https://cdn.jsdelivr.net/combine/npm/magnific-popup@1/dist/jquery.magnific-popup.min.js,npm/lozad/dist/lozad.min.js,npm/clipboard@2/dist/clipboard.min.js"></script> <script src="https://cdn.jsdelivr.net/combine/npm/dayjs@1/dayjs.min.js,npm/dayjs@1/locale/en.min.js,npm/dayjs@1/plugin/relativeTime.min.js,npm/dayjs@1/plugin/localizedFormat.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.bundle.min.js"></script> <script defer src="/app.js"></script>
